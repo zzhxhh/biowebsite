@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热门网站工具导航 - 精选优质网站工具</title>
+    <meta name="description" content="精选优质网站工具，涵盖AI工具、开发资源、设计素材、学习平台等多个分类。配备可爱AI猫咪桌面助手，温馨手绘风格设计。">
+
+    <!-- 外部资源 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="pet/pixel-cat.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" data-aos="fade-down">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-robot"></i>
+                <span>网站导航</span>
+            </div>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    首页
+                </a>
+
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="搜索网站...">
+                </div>
+
+                <a href="about.html" class="nav-link">
+                    <i class="fas fa-info-circle"></i>
+                    关于我们
+                </a>
+
+                <!-- 用户菜单 - 通过JavaScript动态控制显示 -->
+                <div id="userMenuLoggedIn" class="user-menu-section" style="display: none;">
+                    <a href="favorites.html" class="nav-link">
+                        <i class="fas fa-heart"></i>
+                        我的收藏
+                    </a>
+                    <div class="user-menu">
+                        <span class="user-name">
+                            <i class="fas fa-user"></i>
+                            <span id="usernameDisplay"></span>
+                        </span>
+                        <a href="#" class="nav-link" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            退出
+                        </a>
+                    </div>
+                </div>
+
+                <div id="userMenuLoggedOut" class="user-menu-section">
+                    <a href="auth/login.html" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        登录
+                    </a>
+                    <a href="auth/register.html" class="nav-link">
+                        <i class="fas fa-user-plus"></i>
+                        注册
+                    </a>
+                </div>
+
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 头部横幅 -->
+        <section class="hero" data-aos="fade-up">
+            <div class="hero-content">
+                <h1>发现最好的网站工具</h1>
+                <p>精选全球最优质的网站工具和在线服务，从AI工具到开发资源，助力您的工作和创作</p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">27</span>
+                        <span class="stat-label">精选网站</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">6</span>
+                        <span class="stat-label">主要分类</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">2025</span>
+                        <span class="stat-label">最新更新</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 分类导航 -->
+        <section class="categories" data-aos="fade-up" data-aos-delay="200">
+            <div class="container">
+                <h2>网站工具分类</h2>
+                <div class="category-grid">
+                    <div class="category-item active" data-category="all">
+                        <i class="fas fa-th"></i>
+                        <span>全部</span>
+                    </div>
+                    <div class="category-item" data-category="ai">
+                        <i class="fas fa-robot"></i>
+                        <span>AI工具</span>
+                    </div>
+                    <div class="category-item" data-category="development">
+                        <i class="fas fa-code"></i>
+                        <span>开发设计</span>
+                    </div>
+                    <div class="category-item" data-category="learning">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>学习办公</span>
+                    </div>
+                    <div class="category-item" data-category="entertainment">
+                        <i class="fas fa-gamepad"></i>
+                        <span>娱乐社交</span>
+                    </div>
+                    <div class="category-item" data-category="productivity">
+                        <i class="fas fa-tasks"></i>
+                        <span>效率工具</span>
+                    </div>
+                    <div class="category-item" data-category="utility">
+                        <i class="fas fa-tools"></i>
+                        <span>实用网站</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 网站工具网格 -->
+        <section class="tools-section" data-aos="fade-up" data-aos-delay="400">
+            <div class="container">
+                <div class="section-header">
+                    <h2>热门网站工具</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">全部</button>
+                        <button class="filter-btn" data-filter="free">免费</button>
+                        <button class="filter-btn" data-filter="premium">付费</button>
+                    </div>
+                </div>
+
+                <div class="tools-grid" id="toolsGrid">
+                    <!-- AI工具卡片将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer" data-aos="fade-up">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🌐 全能导航</h3>
+                    <p>精选优质网站工具，与可爱的猫咪一起探索互联网的无限可能。</p>
+                </div>
+                <div class="footer-section">
+                    <h4>🎯 网站特色</h4>
+                    <ul>
+                        <li>🔍 智能搜索与分类</li>
+                        <li>📋 详细工具评测</li>
+                        <li>🐱 AI猫咪桌面助手</li>
+                        <li>🎨 温馨手绘风格</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>📊 数据统计</h4>
+                    <div class="footer-stats">
+                        <p>🛠️ 收录网站：27个</p>
+                        <p>📂 涵盖分类：6大类</p>
+                        <p>🆕 最后更新：2025年6月</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 全能导航 - 张子豪的作品 (2330416015). 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 工具详情页 -->
+    <div id="toolDetail" class="tool-detail-overlay hidden">
+        <div class="tool-detail-container">
+            <div class="tool-detail-header">
+                <button class="back-btn" onclick="closeToolDetail()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回</span>
+                </button>
+                <div class="detail-actions">
+                    <button class="detail-favorite-btn" id="detailFavoriteBtn">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tool-detail-content" id="toolDetailContent">
+                <!-- 详情内容将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 纯GIF桌宠 -->
+    <div id="pixel-cat-container">
+        <div id="pixel-cat-menu" class="pixel-cat-menu">
+            <div class="pixel-menu-item" data-action="home">🏠 回到首页</div>
+            <div class="pixel-menu-item" data-action="top">⬆️ 回到顶部</div>
+            <div class="pixel-menu-item" data-action="favorites">❤️ 我的收藏</div>
+            <div class="pixel-menu-item" data-action="theme">🎨 切换主题</div>
+            <div class="pixel-menu-item" data-action="singing">
+                <i class="fas fa-music"></i>
+                <span>让我唱歌</span>
+            </div>
+            <div class="pixel-menu-item" data-action="sleep">😴 休息</div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="data/websites-detail.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/doodle-dialog.js"></script>
+    <script src="js/external-search.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+
+    <!-- 纯GIF桌宠 -->
+    <script src="pet/pixel-cat.js"></script>
+</body>
+</html>

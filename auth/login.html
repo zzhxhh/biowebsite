@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 网站导航</title>
+    
+    <!-- 外部资源 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../css/styles.css?v=1.1">
+    <link rel="stylesheet" href="auth.css?v=1.1">
+    <link rel="stylesheet" href="../css/cat-captcha.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card" data-aos="fade-up">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-compass"></i>
+                    <h1>网站导航</h1>
+                </div>
+                <h2>欢迎回来</h2>
+                <p>登录您的账户，继续探索精彩网站</p>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        用户名或邮箱
+                    </label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="请输入用户名或邮箱">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        密码
+                    </label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="请输入密码">
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="remember">
+                        <span class="checkmark"></span>
+                        记住我
+                    </label>
+                    <a href="#" class="forgot-link">忘记密码？</a>
+                </div>
+
+                <button type="submit" class="auth-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    登录
+                </button>
+
+                <div class="auth-divider">
+                    <span>或</span>
+                </div>
+
+                <div class="auth-links">
+                    <p>还没有账户？</p>
+                    <p><a href="register.html">立即注册</a></p>
+                    <p><a href="../index.html">返回首页</a></p>
+                </div>
+            </form>
+
+            <!-- 消息提示 -->
+            <div id="messageContainer" class="message-container" style="display: none;">
+                <div id="messageContent" class="message"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/cat-captcha.js"></script>
+    <script>
+        // 初始化AOS动画
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // 登录表单处理
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+
+            // 先进行猫咪验证
+            showMessage('请完成安全验证...', 'info');
+            const captchaResult = await window.showCatCaptcha();
+
+            if (!captchaResult) {
+                showMessage('验证失败，请重试', 'error');
+                return;
+            }
+
+            // 显示加载状态
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+            loginBtn.disabled = true;
+
+            try {
+                const response = await fetch('../backend/api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: username,
+                        password: password,
+                        captcha_verified: true
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 保存登录状态到localStorage（兼容性）
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', data.user.username);
+                    localStorage.setItem('userInfo', JSON.stringify(data.user));
+
+                    showMessage('登录成功！正在跳转...', 'success');
+
+                    // 确定重定向URL
+                    const redirectUrl = getRedirectUrl();
+                    console.log('🔗 登录成功，重定向到:', redirectUrl);
+
+                    setTimeout(() => {
+                        // 在重定向URL中添加标识参数
+                        const separator = redirectUrl.includes('?') ? '&' : '?';
+                        const finalUrl = `${redirectUrl}${separator}from_login=1`;
+                        console.log('🔗 最终重定向URL:', finalUrl);
+                        window.location.href = finalUrl;
+                    }, 1500);
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('登录失败:', error);
+                showMessage('网络错误，请重试', 'error');
+            } finally {
+                // 恢复按钮状态
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
+                loginBtn.disabled = false;
+            }
+        });
+
+        // 获取重定向URL
+        function getRedirectUrl() {
+            console.log('🔍 开始获取重定向URL...');
+
+            // 1. 检查URL参数中的redirect
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectParam = urlParams.get('redirect');
+            console.log('📋 URL参数redirect:', redirectParam);
+            if (redirectParam) {
+                console.log('✅ 从URL参数获取重定向:', redirectParam);
+                return decodeURIComponent(redirectParam);
+            }
+
+            // 2. 检查localStorage中保存的重定向URL
+            const savedRedirect = localStorage.getItem('loginRedirectUrl');
+            console.log('💾 localStorage中的重定向URL:', savedRedirect);
+            if (savedRedirect) {
+                localStorage.removeItem('loginRedirectUrl'); // 使用后清除
+                console.log('✅ 从localStorage获取重定向:', savedRedirect);
+                return savedRedirect;
+            }
+
+            // 3. 检查referrer（来源页面）
+            const referrer = document.referrer;
+            console.log('🔙 Referrer:', referrer);
+            if (referrer && !referrer.includes('/auth/') && !referrer.includes('/login')) {
+                console.log('✅ 从referrer获取重定向:', referrer);
+                return referrer;
+            }
+
+            // 4. 默认返回首页
+            console.log('🏠 使用默认重定向: 首页');
+            return '../index.html';
+        }
+
+        // 页面加载时显示调试信息
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 登录页面加载完成，检查重定向信息...');
+            console.log('📋 当前URL:', window.location.href);
+            console.log('💾 localStorage中的重定向URL:', localStorage.getItem('loginRedirectUrl'));
+            console.log('🔙 Referrer:', document.referrer);
+        });
+
+        // 显示消息 - 使用通用工具函数
+        function showMessage(message, type) {
+            Utils.showMessage(message, type);
+        }
+
+        // 主题切换 - 使用通用工具函数
+        // 主题加载已在utils.js中自动处理
+    </script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+/* AI猫咪拖拽喂食验证样式 */
+.cat-captcha-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.cat-captcha-container {
+    background: var(--background-color);
+    border: 4px solid var(--primary-color);
+    border-radius: 30px 35px 30px 35px;
+    max-width: 600px;
+    width: 100%;
+    padding: 30px;
+    position: relative;
+    box-shadow: 
+        8px 8px 0px var(--secondary-color),
+        16px 16px 25px rgba(0, 0, 0, 0.3);
+    transform: rotate(-0.5deg);
+    animation: slideIn 0.5s ease-out;
+    font-family: 'Kalam', cursive;
+}
+
+@keyframes slideIn {
+    from {
+        transform: rotate(-0.5deg) translateY(50px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(-0.5deg) translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 装饰元素 */
+.cat-captcha-container::before {
+    content: '🐾';
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    font-size: 24px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.cat-captcha-container::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 2px dashed var(--accent-color);
+    border-radius: 32px 37px 32px 37px;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* 头部 */
+.cat-captcha-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.cat-captcha-header h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    transform: rotate(0.5deg);
+}
+
+.cat-captcha-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    transform: rotate(-0.3deg);
+}
+
+.captcha-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--surface-color);
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transform: rotate(0.8deg);
+}
+
+.captcha-timer i {
+    color: var(--primary-color);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+/* 游戏区域 */
+.cat-captcha-game {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 25px;
+    min-height: 200px;
+}
+
+/* 猫咪容器 */
+.cat-container {
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+    border: 3px dashed var(--border-color);
+    border-radius: 25px;
+    background: var(--surface-color);
+    transition: all 0.3s ease;
+    position: relative;
+    transform: rotate(-1deg);
+}
+
+.cat-container.drag-over {
+    border-color: var(--primary-color);
+    background: rgba(123, 159, 152, 0.1);
+    transform: rotate(0deg) scale(1.05);
+    box-shadow: var(--shadow-medium);
+}
+
+.cat-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--border-color);
+    object-fit: cover;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.cat-image.crying {
+    filter: grayscale(20%) brightness(0.9);
+}
+
+.cat-image.happy {
+    filter: brightness(1.1) saturate(1.2);
+    border-color: var(--primary-color);
+}
+
+.cat-status {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transform: rotate(0.5deg);
+}
+
+/* 食物容器 */
+.food-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.food-item {
+    background: var(--background-color);
+    border: 3px solid var(--border-color);
+    border-radius: 20px 25px 20px 25px;
+    padding: 15px;
+    text-align: center;
+    cursor: grab;
+    transition: all 0.3s ease;
+    transform: rotate(-0.5deg);
+    user-select: none;
+}
+
+.food-item:nth-child(even) {
+    transform: rotate(0.5deg);
+}
+
+.food-item:hover {
+    transform: rotate(0deg) translateY(-3px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.food-item:active {
+    cursor: grabbing;
+    transform: rotate(0deg) scale(0.95);
+}
+
+.food-item.good-food {
+    border-color: #4CAF50;
+}
+
+.food-item.good-food:hover {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.food-item.bad-food {
+    border-color: #f44336;
+}
+
+.food-item.bad-food:hover {
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.food-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.food-item:nth-child(2) .food-emoji {
+    animation-delay: 0.5s;
+}
+
+.food-item:nth-child(3) .food-emoji {
+    animation-delay: 1s;
+}
+
+.food-item:nth-child(4) .food-emoji {
+    animation-delay: 1.5s;
+}
+
+.food-item span {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* 进度指示器 */
+.progress-indicator {
+    text-align: center;
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: var(--surface-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    transform: rotate(0.3deg);
+}
+
+#feedProgress {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* 底部 */
+.cat-captcha-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.captcha-cancel-btn {
+    background: none;
+    border: 3px solid #f44336;
+    color: #f44336;
+    padding: 10px 20px;
+    border-radius: 15px 20px 15px 20px;
+    font-family: 'Kalam', cursive;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    transform: rotate(1deg);
+}
+
+.captcha-cancel-btn:hover {
+    background: #f44336;
+    color: white;
+    transform: rotate(-1deg) scale(1.05);
+}
+
+.captcha-hint {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    transform: rotate(-0.5deg);
+}
+
+/* 消息提示 */
+.captcha-message {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 15px;
+    font-weight: 600;
+    margin-top: 10px;
+    animation: messageSlide 0.3s ease-out;
+    box-shadow: var(--shadow-medium);
+    border: 2px solid;
+}
+
+.captcha-message i {
+    margin-right: 8px;
+}
+
+.captcha-error {
+    background: #f44336;
+    color: white;
+    border-color: #d32f2f;
+}
+
+.captcha-warning {
+    background: #ff9800;
+    color: white;
+    border-color: #f57c00;
+}
+
+.captcha-info {
+    background: #2196f3;
+    color: white;
+    border-color: #1976d2;
+}
+
+@keyframes messageSlide {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* 动画效果 */
+@keyframes catHappy {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-5deg); }
+    50% { transform: scale(1.15) rotate(0deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(-1deg) translateX(0); }
+    25% { transform: rotate(-1deg) translateX(-5px); }
+    75% { transform: rotate(-1deg) translateX(5px); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-8px); }
+    60% { transform: translateY(-4px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .cat-captcha-container {
+        margin: 10px;
+        padding: 20px;
+        transform: rotate(0deg);
+    }
+    
+    .cat-captcha-game {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .cat-image {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .food-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    
+    .food-item {
+        padding: 10px;
+        transform: rotate(0deg);
+    }
+    
+    .food-emoji {
+        font-size: 2rem;
+    }
+    
+    .cat-captcha-footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .cat-captcha-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .food-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .food-emoji {
+        font-size: 1.8rem;
+    }
+    
+    .food-item span {
+        font-size: 0.8rem;
+    }
+}

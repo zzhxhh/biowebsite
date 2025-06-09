@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的收藏 - 网站导航</title>
+    <meta name="description" content="管理您收藏的网站工具，快速访问喜爱的在线服务。">
+
+    <!-- 外部资源 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="pet/pixel-cat.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" data-aos="fade-down">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-robot"></i>
+                <span>网站导航</span>
+            </div>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    首页
+                </a>
+
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="搜索收藏的网站...">
+                </div>
+
+                <a href="about.html" class="nav-link">
+                    <i class="fas fa-info-circle"></i>
+                    关于我们
+                </a>
+
+                <!-- 用户菜单 - 通过JavaScript动态控制显示 -->
+                <div id="userMenuLoggedIn" class="user-menu-section" style="display: none;">
+                    <a href="favorites.html" class="nav-link active">
+                        <i class="fas fa-heart"></i>
+                        我的收藏
+                    </a>
+                    <div class="user-menu">
+                        <span class="user-name">
+                            <i class="fas fa-user"></i>
+                            <span id="usernameDisplay"></span>
+                        </span>
+                        <a href="#" class="nav-link" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            退出
+                        </a>
+                    </div>
+                </div>
+
+                <div id="userMenuLoggedOut" class="user-menu-section">
+                    <a href="auth/login.html" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        登录
+                    </a>
+                    <a href="auth/register.html" class="nav-link">
+                        <i class="fas fa-user-plus"></i>
+                        注册
+                    </a>
+                </div>
+
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="favorites-main">
+        <div class="container">
+            <!-- 收藏页面头部 -->
+            <div class="favorites-header" data-aos="fade-up">
+                <h1>
+                    <i class="fas fa-heart"></i>
+                    我的收藏
+                </h1>
+                <p>管理您收藏的网站工具，快速访问喜爱的在线服务</p>
+                
+                <div class="favorites-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="favoritesCount">0</span>
+                        <span class="stat-label">个收藏</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收藏列表 -->
+            <div class="favorites-content">
+                <!-- 未登录提示 -->
+                <div id="notLoggedIn" class="empty-favorites" data-aos="fade-up" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <h3>请先登录</h3>
+                    <p>登录后即可查看和管理您的收藏</p>
+                    <a href="auth/login.html" class="discover-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        立即登录
+                    </a>
+                </div>
+
+                <!-- 空收藏提示 -->
+                <div id="emptyFavorites" class="empty-favorites" data-aos="fade-up" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-heart-broken"></i>
+                    </div>
+                    <h3>还没有收藏任何网站</h3>
+                    <p>去首页发现一些有趣的网站工具吧！</p>
+                    <a href="index.html" class="discover-btn">
+                        <i class="fas fa-compass"></i>
+                        发现网站
+                    </a>
+                </div>
+
+                <!-- 收藏网格 -->
+                <div id="favoritesGrid" class="favorites-grid">
+                    <!-- 收藏卡片将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 桌面宠物 -->
+    <div id="pixel-cat-container">
+        <div id="pixel-cat-menu" class="pixel-cat-menu">
+            <div class="pixel-menu-item" data-action="home">🏠 回到首页</div>
+            <div class="pixel-menu-item" data-action="top">⬆️ 回到顶部</div>
+            <div class="pixel-menu-item" data-action="favorites">❤️ 我的收藏</div>
+            <div class="pixel-menu-item" data-action="theme">🎨 切换主题</div>
+            <div class="pixel-menu-item" data-action="singing">
+                <i class="fas fa-music"></i>
+                <span>让我唱歌</span>
+            </div>
+            <div class="pixel-menu-item" data-action="sleep">😴 休息</div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="data/websites-detail.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/doodle-dialog.js"></script>
+    <script src="js/external-search.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/favorites.js"></script>
+    <script src="pet/pixel-cat.js"></script>
+    
+    <script>
+        // 初始化AOS动画
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 100
+        });
+
+
+    </script>
+</body>
+</html>

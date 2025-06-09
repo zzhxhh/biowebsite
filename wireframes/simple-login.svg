@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="700" xmlns="http://www.w3.org/2000/svg">
+  <!-- 页面边框 -->
+  <rect width="600" height="700" fill="white" stroke="#333" stroke-width="2"/>
+  
+  <!-- 导航栏 -->
+  <rect x="20" y="20" width="560" height="50" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="40" y="40" font-family="Arial" font-size="12">logo</text>
+  <text x="300" y="40" font-family="Arial" font-size="12" text-anchor="middle">导航菜单</text>
+  <text x="520" y="40" font-family="Arial" font-size="12">主题切换</text>
+  
+  <!-- 主内容区域 -->
+  <rect x="20" y="90" width="560" height="550" fill="none" stroke="#333" stroke-width="1"/>
+  
+  <!-- 登录表单容器 -->
+  <rect x="150" y="150" width="300" height="350" fill="none" stroke="#333" stroke-width="2"/>
+  <text x="300" y="180" font-family="Arial" font-size="14" text-anchor="middle">登录表单</text>
+  
+  <!-- 表单字段 -->
+  <rect x="170" y="200" width="260" height="30" fill="none" stroke="#666" stroke-width="1"/>
+  <text x="180" y="220" font-family="Arial" font-size="11">用户名输入框</text>
+  
+  <rect x="170" y="250" width="260" height="30" fill="none" stroke="#666" stroke-width="1"/>
+  <text x="180" y="270" font-family="Arial" font-size="11">密码输入框</text>
+  
+  <!-- 验证码区域 -->
+  <rect x="170" y="300" width="260" height="60" fill="none" stroke="#666" stroke-width="1"/>
+  <text x="300" y="335" font-family="Arial" font-size="11" text-anchor="middle">猫咪验证码</text>
+  
+  <!-- 登录按钮 -->
+  <rect x="170" y="380" width="260" height="40" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="300" y="405" font-family="Arial" font-size="12" text-anchor="middle">登录按钮</text>
+  
+  <!-- 其他选项 -->
+  <rect x="170" y="440" width="260" height="40" fill="none" stroke="#666" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="300" y="465" font-family="Arial" font-size="11" text-anchor="middle">注册链接 | 忘记密码</text>
+  
+  <!-- 页脚 -->
+  <rect x="20" y="650" width="560" height="30" fill="none" stroke="#333" stroke-width="1"/>
+  <text x="300" y="670" font-family="Arial" font-size="12" text-anchor="middle">页脚</text>
+  
+  <!-- 标题 -->
+  <text x="300" y="690" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">登录页面布局</text>
+</svg>

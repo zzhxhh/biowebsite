@@ -1,0 +1,13 @@
+# 设置默认首页文件优先级
+DirectoryIndex index.php index.html index.htm
+
+# 启用URL重写
+RewriteEngine On
+
+# 如果访问根目录，重定向到index.php
+RewriteRule ^$ index.php [L]
+
+# 可选：隐藏.php扩展名
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteRule ^([^\.]+)$ $1.php [NC,L]

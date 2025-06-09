@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 网站导航</title>
+    
+    <!-- 外部资源 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="../css/cat-captcha.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card" data-aos="fade-up">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-compass"></i>
+                    <h1>网站导航</h1>
+                </div>
+                <h2>创建账户</h2>
+                <p>加入我们，开始您的网站探索之旅</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        用户名
+                    </label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="请输入用户名" minlength="3" maxlength="20">
+                    <small class="form-hint">3-20个字符，支持字母、数字、下划线</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        邮箱
+                    </label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="请输入邮箱地址">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        密码
+                    </label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="请输入密码" minlength="6">
+                    <small class="form-hint">至少6个字符</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        <i class="fas fa-lock"></i>
+                        确认密码
+                    </label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required 
+                           placeholder="请再次输入密码">
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="agree" required>
+                        <span class="checkmark"></span>
+                        我同意 <a href="#" class="terms-link">服务条款</a> 和 <a href="#" class="privacy-link">隐私政策</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="auth-btn" id="registerBtn">
+                    <i class="fas fa-user-plus"></i>
+                    注册
+                </button>
+
+                <div class="auth-divider">
+                    <span>或</span>
+                </div>
+
+                <div class="auth-links">
+                    <p>已有账户？</p>
+                    <p><a href="login.html">立即登录</a></p>
+                    <p><a href="../index.html">返回首页</a></p>
+                </div>
+            </form>
+
+            <!-- 消息提示 -->
+            <div id="messageContainer" class="message-container" style="display: none;">
+                <div id="messageContent" class="message"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/cat-captcha.js"></script>
+    <script>
+        // 初始化AOS动画
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // 注册表单处理
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const registerBtn = document.getElementById('registerBtn');
+
+            // 前端验证
+            if (password !== confirmPassword) {
+                showMessage('两次输入的密码不一致', 'error');
+                return;
+            }
+
+            // 先进行猫咪验证
+            showMessage('请完成安全验证...', 'info');
+            const captchaResult = await window.showCatCaptcha();
+
+            if (!captchaResult) {
+                showMessage('验证失败，请重试', 'error');
+                return;
+            }
+
+            // 显示加载状态
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 注册中...';
+            registerBtn.disabled = true;
+
+            try {
+                const response = await fetch('../backend/api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'register',
+                        username: username,
+                        email: email,
+                        password: password,
+                        confirmPassword: confirmPassword,
+                        captcha_verified: true
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 保存登录状态到localStorage（兼容性）
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', data.user.username);
+                    localStorage.setItem('userInfo', JSON.stringify(data.user));
+
+                    showMessage('注册成功！正在跳转...', 'success');
+
+                    // 确定重定向URL
+                    const redirectUrl = getRedirectUrl();
+                    console.log('🔗 注册成功，重定向到:', redirectUrl);
+
+                    setTimeout(() => {
+                        // 在重定向URL中添加标识参数
+                        const separator = redirectUrl.includes('?') ? '&' : '?';
+                        const finalUrl = `${redirectUrl}${separator}from_login=1`;
+                        console.log('🔗 最终重定向URL:', finalUrl);
+                        window.location.href = finalUrl;
+                    }, 1500);
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('注册失败:', error);
+                showMessage('网络错误，请重试', 'error');
+            } finally {
+                // 恢复按钮状态
+                registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> 注册';
+                registerBtn.disabled = false;
+            }
+        });
+
+        // 获取重定向URL
+        function getRedirectUrl() {
+            // 1. 检查URL参数中的redirect
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectParam = urlParams.get('redirect');
+            if (redirectParam) {
+                console.log('📋 从URL参数获取重定向:', redirectParam);
+                return decodeURIComponent(redirectParam);
+            }
+
+            // 2. 检查localStorage中保存的重定向URL
+            const savedRedirect = localStorage.getItem('loginRedirectUrl');
+            if (savedRedirect) {
+                localStorage.removeItem('loginRedirectUrl'); // 使用后清除
+                console.log('💾 从localStorage获取重定向:', savedRedirect);
+                return savedRedirect;
+            }
+
+            // 3. 检查referrer（来源页面）
+            const referrer = document.referrer;
+            if (referrer && !referrer.includes('/auth/') && !referrer.includes('/register')) {
+                console.log('🔙 从referrer获取重定向:', referrer);
+                return referrer;
+            }
+
+            // 4. 默认返回首页
+            console.log('🏠 使用默认重定向: 首页');
+            return '../index.html';
+        }
+
+        // 显示消息 - 使用通用工具函数
+        function showMessage(message, type) {
+            Utils.showMessage(message, type);
+        }
+
+        // 主题切换 - 使用通用工具函数
+        // 主题加载已在utils.js中自动处理
+    </script>
+</body>
+</html>

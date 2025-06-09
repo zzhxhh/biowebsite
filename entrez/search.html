@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生物信息学搜索 - 专业数据库检索工具</title>
+    <meta name="description" content="专业的生物信息学数据库搜索工具，支持PubMed、Gene、Protein等多个NCBI数据库检索，提供可视化结果展示。">
+
+    <!-- 外部资源 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- 主网站样式 -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../pet/pixel-cat.css">
+    
+    <!-- 搜索页面专用样式 -->
+    <link rel="stylesheet" href="css/search-page.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" data-aos="fade-down">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-robot"></i>
+                <span>网站导航</span>
+            </div>
+
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    首页
+                </a>
+
+                <a href="../about.html" class="nav-link">
+                    <i class="fas fa-info-circle"></i>
+                    关于我们
+                </a>
+
+                <!-- 用户菜单 - 通过JavaScript动态控制显示 -->
+                <div id="userMenuLoggedIn" class="user-menu-section" style="display: none;">
+                    <a href="../favorites.html" class="nav-link">
+                        <i class="fas fa-heart"></i>
+                        我的收藏
+                    </a>
+                    <div class="user-menu">
+                        <span class="user-name">
+                            <i class="fas fa-user"></i>
+                            <span id="usernameDisplay"></span>
+                        </span>
+                        <a href="#" class="nav-link" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            退出
+                        </a>
+                    </div>
+                </div>
+
+                <div id="userMenuLoggedOut" class="user-menu-section">
+                    <a href="#" class="nav-link" id="loginLink">
+                        <i class="fas fa-sign-in-alt"></i>
+                        登录
+                    </a>
+                    <a href="#" class="nav-link" id="registerLink">
+                        <i class="fas fa-user-plus"></i>
+                        注册
+                    </a>
+                </div>
+
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 搜索页面头部 -->
+        <section class="search-hero" data-aos="fade-up">
+            <div class="container">
+                <h1><i class="fas fa-dna"></i> 生物信息学搜索</h1>
+                <p>🏆 自主开发的专业生物信息数据库搜索工具，基于NCBI Entrez</p>
+                <p>支持PubMed文献、Gene基因、Protein蛋白质等多个数据库检索</p>
+            </div>
+        </section>
+
+        <!-- 搜索功能区域 -->
+        <section class="search-section" data-aos="fade-up" data-aos-delay="200">
+            <div class="container">
+                <div class="search-card">
+                    <form id="searchForm">
+                        <div class="search-form">
+                            <div class="form-group">
+                                <label for="database">数据库</label>
+                                <select id="database" name="database">
+                                    <option value="pubmed">PubMed (文献)</option>
+                                    <option value="gene">Gene (基因)</option>
+                                    <option value="protein">Protein (蛋白质)</option>
+                                    <option value="nucleotide">Nucleotide (核酸)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="keyword">搜索关键词</label>
+                                <input type="text" id="keyword" name="keyword" placeholder="输入搜索关键词..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="method">搜索方式</label>
+                                <select id="method" name="method">
+                                    <option value="get">GET 方式</option>
+                                    <option value="post">POST 方式</option>
+                                    <option value="session">SESSION 方式</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="search-buttons">
+                            <button type="submit" class="search-btn" id="searchBtn">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                            <button type="button" class="search-btn test-btn" onclick="window.bioinfoSearchInstance?.testVisualization()">
+                                <i class="fas fa-flask"></i> 测试可视化
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- 进度条 -->
+                    <div class="progress" id="progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">准备搜索...</div>
+                    </div>
+
+                    <!-- 加载状态 -->
+                    <div class="loading" id="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>正在搜索，请稍候...</p>
+                    </div>
+
+                    <!-- 搜索结果 -->
+                    <div class="results" id="results">
+                        <div class="result-header">
+                            <div class="result-count" id="resultCount"></div>
+                            <div class="result-controls">
+                                <button class="view-toggle-btn active" data-view="list" id="listViewBtn">
+                                    <i class="fas fa-list"></i> 列表视图
+                                </button>
+                                <button class="view-toggle-btn" data-view="chart" id="chartViewBtn">
+                                    <i class="fas fa-chart-bar"></i> 可视化
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 列表视图 -->
+                        <div id="resultList" class="result-view active"></div>
+
+                        <!-- 可视化视图 -->
+                        <div id="chartView" class="result-view chart-container">
+                            <div class="simple-charts">
+                                <!-- 第一个图表 -->
+                                <div class="chart-card">
+                                    <h3 id="firstChartTitle">📊 年份分布</h3>
+                                    <canvas id="yearChart"></canvas>
+                                </div>
+
+                                <!-- 统计分布图 -->
+                                <div class="chart-card">
+                                    <h3>📈 数据统计</h3>
+                                    <canvas id="statsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer" data-aos="fade-up">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🧬 生物信息学搜索</h3>
+                    <p>专业的生物信息数据库搜索工具，基于NCBI Entrez，支持多种数据库检索。</p>
+                </div>
+                <div class="footer-section">
+                    <h4>🎯 功能特色</h4>
+                    <ul>
+                        <li>🔍 多数据库支持</li>
+                        <li>📊 可视化结果展示</li>
+                        <li>🚀 三种搜索方式</li>
+                        <li>🎨 响应式设计</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>📊 技术实现</h4>
+                    <div class="footer-stats">
+                        <p>🛠️ 自主开发</p>
+                        <p>📂 NCBI Entrez API</p>
+                        <p>🆕 实时数据检索</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 生物信息学搜索工具 - 张子豪的作品 (2330416015). 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 纯GIF桌宠 -->
+    <div id="pixel-cat-container">
+        <div id="pixel-cat-menu" class="pixel-cat-menu">
+            <div class="pixel-menu-item" data-action="home">🏠 回到首页</div>
+            <div class="pixel-menu-item" data-action="top">⬆️ 回到顶部</div>
+            <div class="pixel-menu-item" data-action="focus">🔍 聚焦搜索框</div>
+            <div class="pixel-menu-item" data-action="theme">🎨 切换主题</div>
+            <div class="pixel-menu-item" data-action="singing">
+                <i class="fas fa-music"></i>
+                <span>让我唱歌</span>
+            </div>
+            <div class="pixel-menu-item" data-action="sleep">😴 休息</div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="js/simple-charts.js"></script>
+
+    <script>
+        // 认证相关功能 - 保持原有逻辑
+
+
+
+
+
+
+
+        // 极简搜索应用
+        class SimpleSearchApp {
+            constructor() {
+                this.form = document.getElementById('searchForm');
+                this.loading = document.getElementById('loading');
+                this.results = document.getElementById('results');
+                this.visualization = new SimpleVisualization();
+                this.init();
+            }
+
+            init() {
+                this.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSearch();
+                });
+                this.bindViewToggle();
+            }
+
+            bindViewToggle() {
+                const listViewBtn = document.getElementById('listViewBtn');
+                const chartViewBtn = document.getElementById('chartViewBtn');
+
+                listViewBtn?.addEventListener('click', () => this.switchView('list'));
+                chartViewBtn?.addEventListener('click', () => this.switchView('chart'));
+            }
+
+            switchView(viewType) {
+                const listViewBtn = document.getElementById('listViewBtn');
+                const chartViewBtn = document.getElementById('chartViewBtn');
+                const resultList = document.getElementById('resultList');
+                const chartView = document.getElementById('chartView');
+
+                if (viewType === 'list') {
+                    listViewBtn?.classList.add('active');
+                    chartViewBtn?.classList.remove('active');
+                    resultList?.classList.add('active');
+                    chartView?.classList.remove('active');
+                } else {
+                    listViewBtn?.classList.remove('active');
+                    chartViewBtn?.classList.add('active');
+                    resultList?.classList.remove('active');
+                    chartView?.classList.add('active');
+                }
+            }
+
+            async handleSearch() {
+                const formData = new FormData(this.form);
+                const database = formData.get('database');
+                const keyword = formData.get('keyword')?.trim();
+                const method = formData.get('method');
+
+                if (!keyword) {
+                    alert('请输入搜索关键词');
+                    return;
+                }
+
+                this.showLoading(true);
+
+                try {
+                    const results = await this.search(database, keyword, method);
+                    this.displayResults(results);
+                } catch (error) {
+                    this.showError(error.message);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async search(database, keyword, method) {
+                const endpoints = {
+                    get: 'api/search.php',
+                    post: 'api/search_post.php',
+                    session: 'api/search_session.php'
+                };
+
+                let response;
+
+                if (method === 'get') {
+                    const params = new URLSearchParams({
+                        db: database,
+                        term: keyword,
+                        retmax: 20
+                    });
+                    response = await fetch(`${endpoints.get}?${params}`);
+                } else {
+                    const formData = new FormData();
+                    formData.append('db', database);
+                    formData.append('term', keyword);
+                    formData.append('retmax', '20');
+
+                    response = await fetch(endpoints[method], {
+                        method: 'POST',
+                        body: formData,
+                        ...(method === 'session' && { credentials: 'include' })
+                    });
+                }
+
+                if (!response.ok) {
+                    throw new Error(`搜索失败: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.error || '搜索失败');
+                }
+
+                return data;
+            }
+
+            displayResults(data) {
+                const resultCount = document.getElementById('resultCount');
+                const resultList = document.getElementById('resultList');
+
+                if (resultCount) {
+                    resultCount.textContent = `找到 ${data.count} 条结果，显示前 ${data.details.length} 条 (${data.method}方式)`;
+                }
+
+                if (resultList) {
+                    resultList.innerHTML = '';
+                    data.details.forEach(item => {
+                        resultList.appendChild(this.createResultItem(item));
+                    });
+                }
+
+                this.results.style.display = 'block';
+
+                // 生成简单图表
+                this.visualization.generateCharts(data.database, data.details);
+            }
+
+            createResultItem(item) {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+
+                const title = item.title || '无标题';
+                const authors = Array.isArray(item.authors) ? item.authors.join(', ') : '';
+                const journal = item.journal || '';
+                const year = item.year || '';
+                const abstract = item.abstract || '无摘要';
+                const url = item.url || '#';
+
+                div.innerHTML = `
+                    <div class="result-title">
+                        <a href="${url}" target="_blank">${title}</a>
+                    </div>
+                    <div class="result-meta">
+                        ${authors ? `作者: ${authors}` : ''}
+                        ${journal ? ` | 期刊: ${journal}` : ''}
+                        ${year ? ` | 年份: ${year}` : ''}
+                        ${item.pmid ? ` | PMID: ${item.pmid}` : ''}
+                    </div>
+                    <div class="result-abstract">${abstract}</div>
+                `;
+
+                return div;
+            }
+
+            showLoading(show) {
+                this.loading.style.display = show ? 'block' : 'none';
+                const searchBtn = document.getElementById('searchBtn');
+                if (searchBtn) searchBtn.disabled = show;
+            }
+
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+
+                this.form.appendChild(errorDiv);
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+
+            // 测试功能
+            testVisualization() {
+                const mockData = {
+                    success: true,
+                    database: 'pubmed',
+                    method: 'test',
+                    count: 20,
+                    details: Array.from({length: 20}, (_, i) => ({
+                        title: `Test Article ${i + 1}: Machine Learning in Bioinformatics`,
+                        year: 2018 + Math.floor(Math.random() * 6),
+                        authors: ['Smith J', 'Johnson A', 'Brown K'],
+                        journal: 'Nature Biotechnology',
+                        abstract: 'This is a sample abstract for testing visualization purposes...',
+                        pmid: `12345${i}`,
+                        url: '#'
+                    }))
+                };
+                this.displayResults(mockData);
+            }
+        }
+
+        // 初始化搜索功能
+        document.addEventListener('DOMContentLoaded', () => {
+            window.bioinfoSearchInstance = new SimpleSearchApp();
+
+            // 初始化AOS动画
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+
+            // 初始化认证管理器
+            initAuthManager();
+
+            // 保持登录状态
+            checkLoginStatus();
+
+            // 延迟再次检查（确保所有脚本都加载完成）
+            setTimeout(() => {
+                console.log('🔄 延迟检查登录状态...');
+                checkLoginStatus();
+            }, 500);
+
+            // 检查URL参数，如果是从登录页面重定向回来的，强制刷新状态
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('from_login') || document.referrer.includes('/auth/')) {
+                console.log('🔄 检测到从登录页面返回，强制刷新状态...');
+                setTimeout(() => {
+                    checkLoginStatus();
+                }, 1000);
+            }
+
+            // 绑定退出登录事件
+            bindLogoutEvent();
+
+            // 绑定登录注册链接事件
+            bindAuthLinks();
+
+            // 添加调试信息
+            setTimeout(() => {
+                console.log('🔍 页面加载完成，检查元素绑定状态...');
+                const loginLink = document.getElementById('loginLink');
+                const registerLink = document.getElementById('registerLink');
+                console.log('登录链接元素:', loginLink);
+                console.log('注册链接元素:', registerLink);
+
+                if (loginLink) {
+                    console.log('✅ 登录链接找到');
+                    // 手动测试点击事件
+                    loginLink.addEventListener('click', () => {
+                        console.log('🎯 登录链接被点击！');
+                    });
+                } else {
+                    console.error('❌ 登录链接未找到');
+                }
+            }, 1000);
+
+            // 监听登录状态变化
+            setupLoginStateListener();
+        });
+
+        // 设置登录状态监听器
+        function setupLoginStateListener() {
+            // 监听localStorage变化
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'isLoggedIn' || e.key === 'username' || e.key === 'userInfo') {
+                    console.log('🔄 检测到登录状态变化，重新检查...');
+                    setTimeout(checkLoginStatus, 100);
+                }
+            });
+
+            // 监听自定义登录事件
+            window.addEventListener('loginStateChanged', (e) => {
+                console.log('🔄 收到登录状态变化事件:', e.detail);
+                setTimeout(checkLoginStatus, 100);
+            });
+
+            // 定期检查登录状态（防止某些情况下状态不同步）
+            setInterval(() => {
+                checkLoginStatus();
+            }, 30000); // 每30秒检查一次
+
+            // 页面获得焦点时检查登录状态
+            window.addEventListener('focus', () => {
+                console.log('🔄 页面获得焦点，检查登录状态...');
+                setTimeout(checkLoginStatus, 100);
+            });
+
+            // 页面可见性变化时检查登录状态
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    console.log('🔄 页面变为可见，检查登录状态...');
+                    setTimeout(checkLoginStatus, 100);
+                }
+            });
+        }
+
+        // 初始化认证管理器
+        function initAuthManager() {
+            // 设置登录成功后的重定向URL为当前页面
+            if (window.authManager) {
+                window.authManager.setRedirectUrl(window.location.href);
+            }
+        }
+
+        // 检查并保持登录状态
+        function checkLoginStatus() {
+            console.log('🔍 检查登录状态...');
+
+            // 检查多种登录状态存储方式
+            let isLoggedIn = false;
+            let username = '';
+
+            // 方式1：检查authManager
+            if (window.authManager && typeof window.authManager.isLoggedIn === 'function') {
+                isLoggedIn = window.authManager.isLoggedIn();
+                if (isLoggedIn && window.authManager.getCurrentUser) {
+                    const user = window.authManager.getCurrentUser();
+                    username = user ? user.username : '';
+                }
+                console.log('📋 AuthManager检查结果:', isLoggedIn, username);
+            }
+
+            // 方式2：检查localStorage
+            if (!isLoggedIn && localStorage.getItem('isLoggedIn') === 'true') {
+                isLoggedIn = true;
+                username = localStorage.getItem('username') || '';
+                console.log('💾 LocalStorage检查结果:', isLoggedIn, username);
+            }
+
+            // 方式3：检查sessionStorage
+            if (!isLoggedIn) {
+                const sessionUser = sessionStorage.getItem('currentUser');
+                if (sessionUser) {
+                    try {
+                        const user = JSON.parse(sessionUser);
+                        if (user && user.username) {
+                            isLoggedIn = true;
+                            username = user.username;
+                            console.log('🗂️ SessionStorage检查结果:', isLoggedIn, username);
+                        }
+                    } catch (e) {
+                        console.log('解析session用户信息失败:', e);
+                    }
+                }
+            }
+
+            // 方式4：检查userInfo
+            if (!isLoggedIn) {
+                const userInfo = localStorage.getItem('userInfo');
+                if (userInfo) {
+                    try {
+                        const user = JSON.parse(userInfo);
+                        if (user && user.username) {
+                            isLoggedIn = true;
+                            username = user.username;
+                            console.log('📄 UserInfo检查结果:', isLoggedIn, username);
+                        }
+                    } catch (e) {
+                        console.log('解析userInfo失败:', e);
+                    }
+                }
+            }
+
+            console.log('✅ 最终登录状态:', isLoggedIn, username);
+
+            // 更新UI显示
+            updateLoginUI(isLoggedIn, username);
+        }
+
+        // 更新登录UI显示
+        function updateLoginUI(isLoggedIn, username) {
+            console.log('🎨 开始更新UI，状态:', isLoggedIn, '用户名:', username);
+
+            const loggedInMenu = document.getElementById('userMenuLoggedIn');
+            const loggedOutMenu = document.getElementById('userMenuLoggedOut');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+
+            console.log('🔍 UI元素检查:', {
+                loggedInMenu: !!loggedInMenu,
+                loggedOutMenu: !!loggedOutMenu,
+                usernameDisplay: !!usernameDisplay
+            });
+
+            if (isLoggedIn && username) {
+                // 显示已登录状态
+                if (loggedInMenu) {
+                    loggedInMenu.style.display = 'flex';
+                    console.log('✅ 显示已登录菜单');
+                }
+                if (loggedOutMenu) {
+                    loggedOutMenu.style.display = 'none';
+                    console.log('✅ 隐藏未登录菜单');
+                }
+                if (usernameDisplay) {
+                    usernameDisplay.textContent = username;
+                    console.log('✅ 设置用户名显示:', username);
+                }
+
+                console.log('🎉 已登录状态UI更新完成:', username);
+            } else {
+                // 显示未登录状态
+                if (loggedInMenu) {
+                    loggedInMenu.style.display = 'none';
+                    console.log('✅ 隐藏已登录菜单');
+                }
+                if (loggedOutMenu) {
+                    loggedOutMenu.style.display = 'flex';
+                    console.log('✅ 显示未登录菜单');
+                }
+
+                console.log('👤 未登录状态UI更新完成');
+            }
+        }
+
+        // 绑定退出登录事件
+        function bindLogoutEvent() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        }
+
+        // 绑定登录注册链接事件
+        function bindAuthLinks() {
+            const loginLink = document.getElementById('loginLink');
+            const registerLink = document.getElementById('registerLink');
+
+            console.log('🔗 绑定认证链接...', { loginLink, registerLink });
+
+            if (loginLink) {
+                loginLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // 使用URL参数方式传递重定向地址（更可靠）
+                    const currentUrl = encodeURIComponent(window.location.href);
+                    const loginUrl = `../auth/login.html?redirect=${currentUrl}`;
+
+                    console.log('💾 当前页面URL:', window.location.href);
+                    console.log('🔗 登录页面URL:', loginUrl);
+
+                    // 同时保存到localStorage作为备用
+                    localStorage.setItem('loginRedirectUrl', window.location.href);
+                    console.log('💾 备用保存到localStorage');
+
+                    // 跳转到登录页面
+                    console.log('🚀 跳转到登录页面...');
+                    window.location.href = loginUrl;
+                });
+            } else {
+                console.warn('⚠️ 未找到登录链接元素');
+            }
+
+            if (registerLink) {
+                registerLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // 使用URL参数方式传递重定向地址（更可靠）
+                    const currentUrl = encodeURIComponent(window.location.href);
+                    const registerUrl = `../auth/register.html?redirect=${currentUrl}`;
+
+                    console.log('💾 当前页面URL:', window.location.href);
+                    console.log('🔗 注册页面URL:', registerUrl);
+
+                    // 同时保存到localStorage作为备用
+                    localStorage.setItem('loginRedirectUrl', window.location.href);
+                    console.log('💾 备用保存到localStorage');
+
+                    // 跳转到注册页面
+                    console.log('🚀 跳转到注册页面...');
+                    window.location.href = registerUrl;
+                });
+            } else {
+                console.warn('⚠️ 未找到注册链接元素');
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            console.log('🚪 开始退出登录...');
+
+            // 如果有authManager，优先使用其退出方法
+            if (window.authManager && typeof window.authManager.logout === 'function') {
+                window.authManager.logout();
+            } else {
+                // 手动清理所有登录相关的存储
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('userInfo');
+                sessionStorage.removeItem('currentUser');
+
+                console.log('🧹 手动清理登录状态完成');
+            }
+
+            // 更新UI为未登录状态
+            updateLoginUI(false, '');
+
+            // 可选：显示退出成功消息
+            console.log('✅ 退出登录成功，停留在当前页面');
+        }
+
+        // 测试可视化功能
+        function testVisualization() {
+            console.log('🧪 开始测试可视化功能');
+
+            // 模拟搜索结果数据
+            const mockData = {
+                success: true,
+                database: 'pubmed',
+                method: 'test',
+                count: 20,
+                details: []
+            };
+
+            // 生成模拟数据
+            for (let i = 0; i < 20; i++) {
+                mockData.details.push({
+                    title: `Test Article ${i + 1}: Machine Learning in Bioinformatics`,
+                    year: 2018 + Math.floor(Math.random() * 6),
+                    authors: ['Smith J', 'Johnson A', 'Brown K'],
+                    journal: 'Nature Biotechnology',
+                    abstract: 'This is a sample abstract for testing visualization purposes...',
+                    pmid: `12345${i}`,
+                    url: '#'
+                });
+            }
+
+            // 获取全局搜索实例并显示结果
+            if (window.bioinfoSearchInstance) {
+                window.bioinfoSearchInstance.displayResults(mockData);
+            } else {
+                console.error('❌ 搜索实例未找到');
+            }
+        }
+
+        // 添加测试按钮到页面
+        function addTestButton() {
+            const searchButtons = document.querySelector('.search-buttons');
+            if (searchButtons) {
+                const testBtn = document.createElement('button');
+                testBtn.type = 'button';
+                testBtn.className = 'search-btn';
+                testBtn.style.marginLeft = '10px';
+                testBtn.innerHTML = '<i class="fas fa-flask"></i> 测试可视化';
+                testBtn.onclick = testVisualization;
+                searchButtons.appendChild(testBtn);
+            }
+        }
+
+        // 修复图表高度的函数
+        function fixChartHeights() {
+            console.log('🔧 修复图表高度...');
+
+            // 修复所有Canvas元素
+            document.querySelectorAll('.chart-canvas-wrapper canvas').forEach(canvas => {
+                canvas.style.height = '420px';
+                canvas.style.width = '100%';
+                if (canvas.parentElement) {
+                    canvas.parentElement.style.height = '420px';
+                }
+            });
+
+            // 修复D3和Plotly容器
+            document.querySelectorAll('.d3-container, .plotly-container').forEach(container => {
+                container.style.height = '420px';
+                container.style.width = '100%';
+            });
+
+            console.log('✅ 图表高度修复完成');
+        }
+
+        // 添加搜索页面专用的猫咪菜单功能
+        document.addEventListener('DOMContentLoaded', () => {
+            // 添加测试按钮
+            addTestButton();
+
+            // 修复图表高度
+            setTimeout(fixChartHeights, 1000);
+            const pixelCatMenu = document.getElementById('pixel-cat-menu');
+            if (pixelCatMenu) {
+                pixelCatMenu.addEventListener('click', (e) => {
+                    const action = e.target.closest('.pixel-menu-item')?.dataset.action;
+                    if (action) {
+                        switch (action) {
+                            case 'home':
+                                window.location.href = '../index.html';
+                                break;
+                            case 'top':
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                break;
+                            case 'focus':
+                                document.getElementById('keyword').focus();
+                                break;
+                            case 'theme':
+                                document.getElementById('themeToggle')?.click();
+                                break;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- 纯GIF桌宠 -->
+    <script src="../pet/pixel-cat.js"></script>
+</body>
+</html>

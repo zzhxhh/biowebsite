@@ -1,0 +1,599 @@
+/* 像素版AI猫咪宠物专用样式 */
+
+/* 容器样式 */
+#pixel-cat-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+
+
+/* GIF元素样式 - 手绘风格 */
+.cat-gif {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+
+    /* 手绘风格边框 */
+    border: 4px solid #8B4513;
+    border-radius: 15px 20px 18px 22px;
+    background: #FFF8DC;
+
+    /* 手绘阴影效果 */
+    box-shadow:
+        3px 3px 0px #D2B48C,
+        6px 6px 10px rgba(0, 0, 0, 0.15);
+
+    /* 轻微旋转 */
+    transform: rotate(-1deg);
+
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+
+    /* 添加手绘装饰 */
+    position: relative;
+}
+
+/* 手绘装饰边框 */
+.cat-gif::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px dashed #D2B48C;
+    border-radius: 17px 22px 20px 24px;
+    pointer-events: none;
+}
+
+/* 悬停效果 - 手绘风格 */
+.cat-gif:hover {
+    transform: scale(1.1) rotate(1deg);
+    border-color: #A0522D;
+    box-shadow:
+        4px 4px 0px #DEB887,
+        8px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* 菜单样式 */
+.pixel-cat-menu {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    background: linear-gradient(135deg,
+        rgba(255, 248, 240, 0.95) 0%,
+        rgba(255, 240, 230, 0.95) 100%);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.15),
+        0 4px 15px rgba(255, 140, 66, 0.1);
+    border: 3px solid #FFB6C1;
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Comic Sans MS', 'Kalam', cursive, sans-serif;
+}
+
+/* 深色模式下的菜单 */
+[data-theme="dark"] .pixel-cat-menu {
+    background: linear-gradient(135deg,
+        rgba(45, 55, 72, 0.95) 0%,
+        rgba(74, 85, 104, 0.95) 100%);
+    border-color: #68D391;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        0 4px 15px rgba(104, 211, 145, 0.2);
+}
+
+.pixel-cat-menu::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #FFB6C1;
+}
+
+/* 深色模式下的菜单箭头 */
+[data-theme="dark"] .pixel-cat-menu::before {
+    border-top-color: #68D391;
+}
+
+.pixel-cat-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* 菜单项样式 */
+.pixel-menu-item {
+    padding: 10px 15px;
+    margin: 3px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8B4513;
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 深色模式下的菜单项 */
+[data-theme="dark"] .pixel-menu-item {
+    color: #F7FAFC;
+}
+
+.pixel-menu-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 182, 193, 0.3),
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.pixel-menu-item:hover {
+    background: linear-gradient(135deg,
+        rgba(255, 182, 193, 0.2) 0%,
+        rgba(255, 218, 185, 0.2) 100%);
+    border-color: #FF8C42;
+    transform: translateX(5px) scale(1.02);
+    color: #FF6347;
+}
+
+/* 深色模式下的菜单项悬停 */
+[data-theme="dark"] .pixel-menu-item:hover {
+    background: linear-gradient(135deg,
+        rgba(104, 211, 145, 0.2) 0%,
+        rgba(246, 173, 85, 0.2) 100%);
+    border-color: #68D391;
+    color: #68D391;
+}
+
+.pixel-menu-item:hover::before {
+    left: 100%;
+}
+
+.pixel-menu-item:active {
+    transform: translateX(3px) scale(0.98);
+}
+
+/* 音乐菜单项特殊样式 */
+.pixel-menu-item.active {
+    background: linear-gradient(135deg,
+        rgba(255, 215, 0, 0.3) 0%,
+        rgba(255, 165, 0, 0.3) 100%);
+    border-color: #FFD700;
+    color: #FF8C00;
+}
+
+[data-theme="dark"] .pixel-menu-item.active {
+    background: linear-gradient(135deg,
+        rgba(255, 215, 0, 0.2) 0%,
+        rgba(255, 165, 0, 0.2) 100%);
+    border-color: #FFD700;
+    color: #FFD700;
+}
+
+.pixel-menu-item i {
+    margin-right: 5px;
+    width: 16px;
+    text-align: center;
+}
+
+/* 音乐播放动画 */
+@keyframes musicPulse {
+    0%, 100% {
+        transform: scale(1);
+        color: #FFD700;
+    }
+    50% {
+        transform: scale(1.1);
+        color: #FF8C00;
+    }
+}
+
+/* 音乐菜单项悬停效果增强 */
+.pixel-menu-item[data-action="music"]:hover {
+    background: linear-gradient(135deg,
+        rgba(255, 215, 0, 0.4) 0%,
+        rgba(255, 165, 0, 0.4) 100%);
+}
+
+.pixel-menu-item[data-action="music"].active:hover {
+    background: linear-gradient(135deg,
+        rgba(255, 215, 0, 0.6) 0%,
+        rgba(255, 165, 0, 0.6) 100%);
+}
+
+/* 消息提示样式 - 手绘风格 */
+.pixel-cat-message {
+    position: fixed;
+    /* 位置由JavaScript动态设置 */
+    background: #FFF8DC;
+    color: #8B4513;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-family: 'Comic Sans MS', cursive;
+    font-weight: 600;
+    z-index: 1001;
+    pointer-events: none;
+    animation: pixelCatMessageAnim 2.5s ease-in-out;
+    max-width: 200px;
+    text-align: center;
+    word-wrap: break-word;
+
+    /* 手绘风格边框 */
+    border: 3px solid #8B4513;
+    border-radius: 18px 25px 20px 22px;
+    transform: rotate(1deg);
+
+    /* 手绘阴影效果 */
+    box-shadow:
+        4px 4px 0px #D2B48C,
+        8px 8px 12px rgba(0, 0, 0, 0.2);
+
+    /* 添加小装饰 */
+    position: relative;
+}
+
+/* 添加手绘装饰点 */
+.pixel-cat-message::before {
+    content: '✨';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.pixel-cat-message::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px dashed #D2B48C;
+    border-radius: 20px 27px 22px 24px;
+    pointer-events: none;
+}
+
+/* 错误消息样式 - 手绘风格 */
+.pixel-cat-message.error {
+    background: #FFE4E1;
+    color: #DC143C;
+    border-color: #DC143C;
+    box-shadow:
+        4px 4px 0px #F0C0C0,
+        8px 8px 12px rgba(220, 20, 60, 0.2);
+}
+
+.pixel-cat-message.error::before {
+    content: '⚠️';
+}
+
+.pixel-cat-message.error::after {
+    border-color: #F0C0C0;
+}
+
+/* 成功消息样式 - 手绘风格 */
+.pixel-cat-message.success {
+    background: #F0FFF0;
+    color: #228B22;
+    border-color: #228B22;
+    box-shadow:
+        4px 4px 0px #C0F0C0,
+        8px 8px 12px rgba(34, 139, 34, 0.2);
+}
+
+.pixel-cat-message.success::before {
+    content: '🌟';
+}
+
+.pixel-cat-message.success::after {
+    border-color: #C0F0C0;
+}
+
+/* 信息消息样式 - 手绘风格 */
+.pixel-cat-message.info {
+    background: #E6F3FF;
+    color: #4169E1;
+    border-color: #4169E1;
+    box-shadow:
+        4px 4px 0px #B3D9FF,
+        8px 8px 12px rgba(65, 105, 225, 0.2);
+}
+
+.pixel-cat-message.info::before {
+    content: '💭';
+}
+
+.pixel-cat-message.info::after {
+    border-color: #B3D9FF;
+}
+
+/* 叫醒提示样式 - 手绘风格 */
+.wake-up-hint {
+    position: fixed;
+    background: #FFF8DC;
+    color: #8B4513;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: 'Comic Sans MS', cursive;
+    font-weight: 600;
+    z-index: 1002;
+    pointer-events: none;
+    animation: wakeUpHintAnim 0.3s ease-out;
+    width: 120px;
+    text-align: center;
+
+    /* 手绘风格边框 */
+    border: 3px solid #8B4513;
+    border-radius: 15px 20px 18px 16px;
+    transform: rotate(-1deg);
+
+    /* 手绘阴影效果 */
+    box-shadow:
+        3px 3px 0px #D2B48C,
+        6px 6px 8px rgba(0, 0, 0, 0.2);
+
+    /* 添加小尾巴 */
+    position: relative;
+}
+
+.wake-up-hint::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid #8B4513;
+}
+
+.wake-up-hint::before {
+    content: '';
+    position: absolute;
+    top: 97%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #FFF8DC;
+    z-index: 1;
+}
+
+@keyframes wakeUpHintAnim {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.9) rotate(-1deg);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(-1deg);
+    }
+}
+
+/* 动画定义 */
+@keyframes pixelCatMessageAnim {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8) rotate(1deg);
+    }
+    15% {
+        opacity: 1;
+        transform: translateY(0) scale(1.05) rotate(1deg);
+    }
+    20% {
+        transform: translateY(0) scale(1) rotate(1deg);
+    }
+    85% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(1deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.9) rotate(1deg);
+    }
+}
+
+/* 装饰闪烁动画 */
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(0.8) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+/* 特效动画 */
+@keyframes pixelSparkle {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+    }
+}
+
+@keyframes pixelFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(5deg);
+    }
+}
+
+@keyframes pixelBounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-15px) scale(1.1);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    #pixel-cat-container {
+        bottom: 15px;
+        right: 15px;
+    }
+
+
+
+    .pixel-cat-menu {
+        bottom: 65px;
+        min-width: 160px;
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .pixel-menu-item {
+        font-size: 13px;
+        padding: 8px 12px;
+        border-radius: 10px;
+    }
+
+    .pixel-cat-message {
+        font-size: 13px;
+        padding: 8px 14px;
+        bottom: 85px;
+        right: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .pixel-cat-menu {
+        bottom: 55px;
+        min-width: 140px;
+        padding: 8px;
+    }
+
+    .pixel-menu-item {
+        font-size: 12px;
+        padding: 6px 10px;
+        gap: 6px;
+    }
+
+    .pixel-cat-message {
+        font-size: 12px;
+        padding: 6px 12px;
+        bottom: 70px;
+    }
+}
+
+/* 可爱的装饰效果 */
+.pixel-cat-menu::after {
+    content: '🐾';
+    position: absolute;
+    top: -15px;
+    left: 10px;
+    font-size: 16px;
+    animation: pixelFloat 3s ease-in-out infinite;
+}
+
+/* 拖拽时的样式 - 手绘风格 */
+#pixel-cat-container.dragging {
+    transform: rotate(8deg) scale(1.15);
+}
+
+#pixel-cat-container.dragging .cat-gif {
+    border-color: #FF6347;
+    background: #FFF5EE;
+    box-shadow:
+        5px 5px 0px #FFB6C1,
+        10px 10px 20px rgba(255, 99, 71, 0.4);
+    transform: rotate(3deg);
+}
+
+#pixel-cat-container.dragging .cat-gif::before {
+    border-color: #FFB6C1;
+}
+
+/* 睡觉状态的特殊样式 - 手绘风格 */
+#pixel-cat-container.sleeping {
+    opacity: 0.85;
+    animation: sleepingBreath 4s ease-in-out infinite;
+}
+
+#pixel-cat-container.sleeping .cat-gif {
+    /* 睡觉时的蓝色手绘边框 */
+    border-color: #4682B4;
+    background: #F0F8FF;
+    box-shadow:
+        3px 3px 0px #B0C4DE,
+        6px 6px 12px rgba(70, 130, 180, 0.2);
+    transform: rotate(-2deg);
+}
+
+#pixel-cat-container.sleeping .cat-gif::before {
+    border-color: #B0C4DE;
+}
+
+#pixel-cat-container.sleeping .cat-gif:hover {
+    transform: scale(1.05) rotate(0deg);
+    border-color: #6495ED;
+    box-shadow:
+        4px 4px 0px #C6D9F0,
+        8px 8px 15px rgba(100, 149, 237, 0.3);
+}
+
+/* 睡觉呼吸动画 */
+@keyframes sleepingBreath {
+    0%, 100% {
+        transform: scale(0.95);
+    }
+    50% {
+        transform: scale(0.98);
+    }
+}
+
+/* 唱歌动画 */
+@keyframes singingPulse {
+    0%, 100% {
+        transform: scale(1);
+        color: #ff6b6b;
+    }
+    50% {
+        transform: scale(1.2);
+        color: #ff8e8e;
+    }
+}
