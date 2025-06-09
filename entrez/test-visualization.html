@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可视化测试 - 生物信息学搜索</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="css/search-page.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin: 40px 0;">📊 可视化组件测试</h1>
+        
+        <!-- 测试图表容器 -->
+        <div class="chart-container">
+            <div class="simple-charts">
+                <!-- 柱状图测试 -->
+                <div class="chart-card interactive">
+                    <h3>📊 年份分布测试</h3>
+                    <div style="position: relative;">
+                        <canvas id="testBarChart"></canvas>
+                        <div class="chart-zoom-hint">滚轮缩放 | 拖拽移动</div>
+                    </div>
+                </div>
+
+                <!-- 饼图测试 -->
+                <div class="chart-card interactive">
+                    <h3>📈 数据统计测试</h3>
+                    <div style="position: relative;">
+                        <canvas id="testPieChart"></canvas>
+                        <div class="chart-zoom-hint">滚轮缩放 | 拖拽移动</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试按钮 -->
+        <div style="text-align: center; margin: 30px 0;">
+            <button onclick="testBarChart()" class="btn btn-primary" style="margin: 0 10px;">
+                测试柱状图
+            </button>
+            <button onclick="testPieChart()" class="btn btn-secondary" style="margin: 0 10px;">
+                测试饼图
+            </button>
+            <button onclick="testBothCharts()" class="btn btn-accent" style="margin: 0 10px;">
+                测试所有图表
+            </button>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="search.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> 返回搜索页面
+            </a>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/simple-charts.js"></script>
+    <script>
+        // 测试数据
+        const testBarData = {
+            labels: ['2020', '2021', '2022', '2023', '2024'],
+            values: [45, 67, 89, 123, 156]
+        };
+
+        const testPieData = {
+            labels: ['蛋白编码基因', 'microRNA', 'lncRNA', 'rRNA', 'tRNA', '其他'],
+            values: [120, 45, 32, 18, 25, 15]
+        };
+
+        // 测试函数
+        function testBarChart() {
+            console.log('测试柱状图...');
+            const canvas = document.getElementById('testBarChart');
+            if (canvas && window.visualization) {
+                window.visualization.drawBarChartNative(canvas, testBarData, '年份分布测试');
+            }
+        }
+
+        function testPieChart() {
+            console.log('测试饼图...');
+            const canvas = document.getElementById('testPieChart');
+            if (canvas && window.visualization) {
+                window.visualization.drawPieChartNative(canvas, testPieData, '基因类型分布测试');
+            }
+        }
+
+        function testBothCharts() {
+            console.log('测试所有图表...');
+            testBarChart();
+            setTimeout(testPieChart, 500);
+        }
+
+        // 页面加载完成后自动测试
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始测试...');
+            setTimeout(testBothCharts, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -334,9 +334,12 @@
     display: block;
 }
 
-/* 极简图表容器样式 */
+/* 高质量图表容器样式 */
 .chart-container {
     padding: 30px 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+    border-radius: 20px;
+    margin: 20px 0;
 }
 
 .simple-charts {
@@ -345,6 +348,7 @@
     gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
 }
 
 .chart-card {
@@ -353,8 +357,22 @@
     border-radius: 20px;
     padding: 25px;
     box-shadow: var(--shadow-light);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform: rotate(-0.5deg);
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .chart-card:nth-child(even) {
@@ -362,9 +380,13 @@
 }
 
 .chart-card:hover {
-    transform: rotate(0deg) translateY(-5px);
-    box-shadow: var(--shadow-medium);
+    transform: rotate(0deg) translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     border-color: var(--primary-color);
+}
+
+.chart-card:hover::before {
+    opacity: 1;
 }
 
 .chart-card h3 {
@@ -374,37 +396,175 @@
     color: var(--text-primary);
     margin-bottom: 20px;
     text-align: center;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.chart-card h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 1px;
 }
 
 .chart-card canvas {
     width: 100% !important;
     height: 300px !important;
     border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: crosshair;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .simple-charts {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 0 20px;
-    }
-
-    .chart-card {
-        padding: 20px;
-        transform: rotate(0deg);
-    }
-
-    .chart-card:hover {
-        transform: translateY(-3px);
-    }
-
-    .chart-card canvas {
-        height: 250px !important;
-    }
+.chart-card canvas:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* 工具提示样式 */
+.chart-tooltip {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    max-width: 200px;
+    word-wrap: break-word;
+}
 
+/* 加载动画 */
+.chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.chart-loading::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 图表交互状态 */
+.chart-card.interactive {
+    cursor: pointer;
+}
+
+.chart-card.interactive:active {
+    transform: rotate(0deg) translateY(-6px) scale(0.98);
+}
+
+/* 图表进度条样式 */
+.chart-progress {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.progress-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    margin: 0 auto 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 3px;
+    animation: progressAnimation 2s ease-in-out infinite;
+    width: 0%;
+}
+
+@keyframes progressAnimation {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+}
+
+.chart-progress p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 图表控制按钮 */
+.chart-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.chart-control-btn {
+    background: var(--surface-color);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-control-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.chart-control-btn:active {
+    transform: translateY(0);
+}
+
+.chart-control-btn i {
+    font-size: 11px;
+}
+
+/* 图表缩放提示 */
+.chart-zoom-hint {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.chart-card:hover .chart-zoom-hint {
+    opacity: 1;
+}
 
 /* 深色模式适配 */
 [data-theme="dark"] .chart-card {
@@ -412,33 +572,35 @@
     border-color: var(--border-color);
 }
 
-
+[data-theme="dark"] .chart-container {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+}
 
 /* 响应式设计 */
 @media (max-width: 768px) {
     .search-form {
         grid-template-columns: 1fr;
     }
-    
+
     .search-hero h1 {
         font-size: 2.5rem;
     }
-    
+
     .search-card {
         padding: 25px;
         margin: 0 20px;
     }
-    
+
     .search-buttons {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .result-item {
         padding: 20px;
         margin: 0 10px 15px 10px;
     }
-    
+
     .result-title {
         font-size: 1.1rem;
     }
@@ -453,5 +615,43 @@
         justify-content: center;
     }
 
+    .simple-charts {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 10px;
+    }
 
+    .chart-card {
+        padding: 20px;
+        transform: rotate(0deg);
+    }
+
+    .chart-card:hover {
+        transform: translateY(-5px) scale(1.01);
+    }
+
+    .chart-card canvas {
+        height: 250px !important;
+    }
+
+    .chart-container {
+        padding: 20px 0;
+        margin: 10px 0;
+    }
+}
+
+/* 平板设备适配 */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .simple-charts {
+        gap: 25px;
+        padding: 0 15px;
+    }
+
+    .chart-card {
+        padding: 22px;
+    }
+
+    .chart-card canvas {
+        height: 280px !important;
+    }
 }

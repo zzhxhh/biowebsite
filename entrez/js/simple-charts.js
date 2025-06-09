@@ -1,6 +1,6 @@
 /**
- * 极简可视化组件
- * 使用Canvas原生绘图，无需外部依赖
+ * 高质量可视化组件
+ * 使用Canvas原生绘图，支持高DPI和交互功能
  */
 
 class SimpleVisualization {
@@ -10,31 +10,162 @@ class SimpleVisualization {
             secondary: '#8b5cf6',
             accent: '#10b981',
             warning: '#f59e0b',
-            success: '#059669'
+            success: '#059669',
+            info: '#06b6d4',
+            purple: '#a855f7',
+            pink: '#ec4899',
+            indigo: '#6366f1',
+            emerald: '#10b981'
         };
+
+        // 交互状态
+        this.hoveredElement = null;
+        this.tooltip = null;
+        this.animationFrame = null;
+
+        // 高DPI支持
+        this.pixelRatio = window.devicePixelRatio || 1;
+
+        // 初始化工具提示
+        this.initTooltip();
+    }
+
+    // 初始化工具提示元素
+    initTooltip() {
+        if (!this.tooltip) {
+            this.tooltip = document.createElement('div');
+            this.tooltip.className = 'chart-tooltip';
+            this.tooltip.style.cssText = `
+                position: absolute;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            `;
+            document.body.appendChild(this.tooltip);
+        }
+    }
+
+    // 显示工具提示
+    showTooltip(x, y, content) {
+        if (this.tooltip) {
+            this.tooltip.innerHTML = content;
+            this.tooltip.style.left = x + 10 + 'px';
+            this.tooltip.style.top = y - 10 + 'px';
+            this.tooltip.style.opacity = '1';
+        }
+    }
+
+    // 隐藏工具提示
+    hideTooltip() {
+        if (this.tooltip) {
+            this.tooltip.style.opacity = '0';
+        }
+    }
+
+    // 设置高DPI Canvas
+    setupHighDPICanvas(canvas) {
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+
+        // 设置实际大小
+        canvas.width = rect.width * this.pixelRatio;
+        canvas.height = rect.height * this.pixelRatio;
+
+        // 缩放上下文以匹配设备像素比
+        ctx.scale(this.pixelRatio, this.pixelRatio);
+
+        // 设置CSS大小
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+
+        return ctx;
     }
 
     // 主要生成函数 - 根据数据库类型生成合适的图表
     generateCharts(database, data) {
-        console.log('📊 生成Canvas原生图表，数据库:', database, '数据量:', data.length);
+        console.log('📊 生成高质量Canvas图表，数据库:', database, '数据量:', data.length);
 
         if (!data || data.length === 0) {
             this.showNoData();
             return;
         }
 
+        // 显示进度条
+        this.showChartProgress();
+
         // 更新第一个图表的标题
         this.updateFirstChartTitle(database);
 
-        // 图表1：根据数据库类型决定是否显示年份分布
-        if (this.shouldShowYearChart(database)) {
-            this.generateYearChart(data);
-        } else {
-            this.generateAlternativeChart(database, data);
-        }
+        // 使用setTimeout来模拟异步处理，提供更好的用户体验
+        setTimeout(() => {
+            try {
+                // 图表1：根据数据库类型决定是否显示年份分布
+                if (this.shouldShowYearChart(database)) {
+                    this.generateYearChart(data);
+                } else {
+                    this.generateAlternativeChart(database, data);
+                }
 
-        // 图表2：数据统计饼图
-        this.generateStatsChart(database, data);
+                // 短暂延迟后生成第二个图表
+                setTimeout(() => {
+                    // 图表2：数据统计饼图
+                    this.generateStatsChart(database, data);
+
+                    // 隐藏进度条
+                    this.hideChartProgress();
+                }, 300);
+
+            } catch (error) {
+                console.error('图表生成错误:', error);
+                this.hideChartProgress();
+                this.showError('图表生成失败，请重试');
+            }
+        }, 100);
+    }
+
+    // 显示图表进度条
+    showChartProgress() {
+        const progressElement = document.getElementById('chartProgress');
+        const chartsContainer = document.querySelector('.simple-charts');
+
+        if (progressElement) {
+            progressElement.style.display = 'block';
+        }
+        if (chartsContainer) {
+            chartsContainer.style.opacity = '0.5';
+        }
+    }
+
+    // 隐藏图表进度条
+    hideChartProgress() {
+        const progressElement = document.getElementById('chartProgress');
+        const chartsContainer = document.querySelector('.simple-charts');
+
+        if (progressElement) {
+            progressElement.style.display = 'none';
+        }
+        if (chartsContainer) {
+            chartsContainer.style.opacity = '1';
+        }
+    }
+
+    // 显示错误信息
+    showError(message) {
+        const progressElement = document.getElementById('chartProgress');
+        if (progressElement) {
+            progressElement.innerHTML = `
+                <div style="color: var(--error-color); font-weight: 500;">
+                    ⚠️ ${message}
+                </div>
+            `;
+        }
     }
 
     // 更新第一个图表的标题
@@ -732,14 +863,12 @@ class SimpleVisualization {
 
 
 
-    // Canvas原生绘图 - 柱状图
+    // Canvas原生绘图 - 增强柱状图
     drawBarChartNative(canvas, data, title) {
-        const ctx = canvas.getContext('2d');
-        const width = canvas.offsetWidth || 400;
-        const height = canvas.offsetHeight || 300;
-
-        canvas.width = width;
-        canvas.height = height;
+        const ctx = this.setupHighDPICanvas(canvas);
+        const rect = canvas.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
 
         ctx.clearRect(0, 0, width, height);
 
@@ -756,13 +885,19 @@ class SimpleVisualization {
             return;
         }
 
-        // 计算绘图区域 - 增加底部空间避免标签重叠
+        // 计算绘图区域
         const padding = 50;
-        const bottomPadding = 80; // 增加底部空间
+        const bottomPadding = 80;
         const chartWidth = width - padding * 2;
-        const chartHeight = height - 60 - bottomPadding; // 调整图表高度
-        const barWidth = Math.min(chartWidth / data.labels.length * 0.6, 40); // 限制柱子最大宽度
+        const chartHeight = height - 60 - bottomPadding;
+        const barWidth = Math.min(chartWidth / data.labels.length * 0.6, 40);
         const maxValue = Math.max(...data.values);
+
+        // 绘制网格线
+        this.drawGridLines(ctx, padding, 60, chartWidth, chartHeight, maxValue);
+
+        // 存储柱子位置信息用于交互
+        const barPositions = [];
 
         // 绘制柱状图
         data.labels.forEach((label, index) => {
@@ -771,14 +906,30 @@ class SimpleVisualization {
             const x = padding + (chartWidth / data.labels.length) * index + (chartWidth / data.labels.length - barWidth) / 2;
             const y = height - bottomPadding - barHeight;
 
-            // 绘制柱子
-            ctx.fillStyle = this.colors.primary;
+            // 存储位置信息
+            barPositions.push({
+                x, y, width: barWidth, height: barHeight,
+                label, value, index
+            });
+
+            // 绘制柱子渐变效果
+            const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+            const color = this.colors[Object.keys(this.colors)[index % Object.keys(this.colors).length]];
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, this.adjustColorBrightness(color, -20));
+
+            ctx.fillStyle = gradient;
             ctx.fillRect(x, y, barWidth, barHeight);
 
+            // 绘制柱子边框
+            ctx.strokeStyle = this.adjustColorBrightness(color, -30);
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, barWidth, barHeight);
+
             // 绘制数值（在柱子上方）
-            if (barHeight > 20) { // 只有柱子足够高时才显示数值
+            if (barHeight > 20) {
                 ctx.fillStyle = '#374151';
-                ctx.font = '11px Inter, sans-serif';
+                ctx.font = 'bold 11px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(value, x + barWidth / 2, y - 8);
             }
@@ -786,23 +937,103 @@ class SimpleVisualization {
             // 绘制标签（旋转45度避免重叠）
             ctx.save();
             ctx.translate(x + barWidth / 2, height - bottomPadding + 15);
-            ctx.rotate(-Math.PI / 4); // 旋转-45度
+            ctx.rotate(-Math.PI / 4);
             ctx.fillStyle = '#374151';
             ctx.font = '10px Inter, sans-serif';
             ctx.textAlign = 'right';
             ctx.fillText(label, 0, 0);
             ctx.restore();
         });
+
+        // 添加鼠标交互
+        this.addBarChartInteraction(canvas, barPositions);
+
+        // 添加图表控制按钮
+        this.addChartControls(canvas.id, title);
+
+        // 添加缩放功能
+        this.addZoomFeature(canvas);
     }
 
-    // Canvas原生绘图 - 饼图
-    drawPieChartNative(canvas, data, title) {
-        const ctx = canvas.getContext('2d');
-        const width = canvas.offsetWidth || 400;
-        const height = canvas.offsetHeight || 300;
+    // 绘制网格线
+    drawGridLines(ctx, startX, startY, width, height, maxValue) {
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
 
-        canvas.width = width;
-        canvas.height = height;
+        // 绘制水平网格线
+        const gridLines = 5;
+        for (let i = 0; i <= gridLines; i++) {
+            const y = startY + (height / gridLines) * i;
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(startX + width, y);
+            ctx.stroke();
+
+            // 绘制Y轴标签
+            const value = Math.round(maxValue * (1 - i / gridLines));
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(value, startX - 10, y + 3);
+        }
+
+        ctx.setLineDash([]);
+    }
+
+    // 调整颜色亮度
+    adjustColorBrightness(color, amount) {
+        const hex = color.replace('#', '');
+        const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+        const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+        const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    }
+
+    // 添加柱状图交互
+    addBarChartInteraction(canvas, barPositions) {
+        const handleMouseMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            let found = false;
+            for (const bar of barPositions) {
+                if (x >= bar.x && x <= bar.x + bar.width &&
+                    y >= bar.y && y <= bar.y + bar.height) {
+                    canvas.style.cursor = 'pointer';
+                    this.showTooltip(e.clientX, e.clientY, `${bar.label}: ${bar.value}`);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                canvas.style.cursor = 'default';
+                this.hideTooltip();
+            }
+        };
+
+        const handleMouseLeave = () => {
+            canvas.style.cursor = 'default';
+            this.hideTooltip();
+        };
+
+        // 移除旧的事件监听器
+        canvas.removeEventListener('mousemove', handleMouseMove);
+        canvas.removeEventListener('mouseleave', handleMouseLeave);
+
+        // 添加新的事件监听器
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    // Canvas原生绘图 - 增强饼图
+    drawPieChartNative(canvas, data, title) {
+        const ctx = this.setupHighDPICanvas(canvas);
+        const rect = canvas.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
 
         ctx.clearRect(0, 0, width, height);
 
@@ -821,59 +1052,127 @@ class SimpleVisualization {
 
         // 计算饼图参数
         const centerX = width / 2;
-        const centerY = height / 2 - 10; // 向上移动饼图
-        const radius = Math.min(width, height) / 5; // 缩小饼图为图例留出空间
+        const centerY = height / 2 - 10;
+        const radius = Math.min(width, height) / 5;
         const total = data.values.reduce((sum, val) => sum + val, 0);
 
-        let currentAngle = -Math.PI / 2; // 从顶部开始
-        const colors = [this.colors.primary, this.colors.secondary, this.colors.accent, this.colors.warning, this.colors.success];
+        let currentAngle = -Math.PI / 2;
+        const colors = [
+            this.colors.primary, this.colors.secondary, this.colors.accent,
+            this.colors.warning, this.colors.success, this.colors.info,
+            this.colors.purple, this.colors.pink, this.colors.indigo, this.colors.emerald
+        ];
+
+        // 存储扇形位置信息用于交互
+        const slicePositions = [];
 
         // 绘制饼图扇形
         data.labels.forEach((label, index) => {
             const value = data.values[index];
             const sliceAngle = (value / total) * 2 * Math.PI;
+            const color = colors[index % colors.length];
+
+            // 存储位置信息
+            slicePositions.push({
+                centerX, centerY, radius,
+                startAngle: currentAngle,
+                endAngle: currentAngle + sliceAngle,
+                label, value, color,
+                percentage: ((value / total) * 100).toFixed(1)
+            });
+
+            // 绘制扇形阴影
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
 
             // 绘制扇形
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
             ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
             ctx.closePath();
-            ctx.fillStyle = colors[index % colors.length];
+
+            // 创建渐变效果
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, this.adjustColorBrightness(color, 20));
+            gradient.addColorStop(1, color);
+
+            ctx.fillStyle = gradient;
             ctx.fill();
+
+            ctx.restore();
 
             // 绘制边框
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 2;
             ctx.stroke();
 
+            // 绘制百分比标签（在扇形中心）
+            if (sliceAngle > 0.2) { // 只有足够大的扇形才显示标签
+                const labelAngle = currentAngle + sliceAngle / 2;
+                const labelRadius = radius * 0.7;
+                const labelX = centerX + Math.cos(labelAngle) * labelRadius;
+                const labelY = centerY + Math.sin(labelAngle) * labelRadius;
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 11px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 3;
+                ctx.strokeText(`${((value / total) * 100).toFixed(1)}%`, labelX, labelY);
+                ctx.fillText(`${((value / total) * 100).toFixed(1)}%`, labelX, labelY);
+            }
+
             currentAngle += sliceAngle;
         });
 
-        // 绘制图例 - 垂直布局避免重叠
-        const legendStartY = height - 80;
-        const legendItemHeight = 20;
-        const maxItemsPerRow = Math.floor(width / 120); // 每行最多显示的项目数
+        // 绘制改进的图例
+        this.drawImprovedLegend(ctx, data, colors, width, height);
+
+        // 添加鼠标交互
+        this.addPieChartInteraction(canvas, slicePositions);
+
+        // 添加图表控制按钮
+        this.addChartControls(canvas.id, title);
+
+        // 添加缩放功能
+        this.addZoomFeature(canvas);
+    }
+
+    // 绘制改进的图例
+    drawImprovedLegend(ctx, data, colors, width, height) {
+        const legendStartY = height - 90;
+        const legendItemHeight = 18;
+        const maxItemsPerRow = Math.floor(width / 140);
 
         data.labels.forEach((label, index) => {
             const row = Math.floor(index / maxItemsPerRow);
             const col = index % maxItemsPerRow;
-            const x = 20 + col * 120; // 每个图例项占120px宽度
+            const x = 20 + col * 140;
             const y = legendStartY + row * legendItemHeight;
 
-            // 确保不超出画布边界
             if (y < height - 10) {
-                // 绘制颜色块
+                // 绘制圆形颜色指示器
                 ctx.fillStyle = colors[index % colors.length];
-                ctx.fillRect(x, y - 8, 12, 12);
+                ctx.beginPath();
+                ctx.arc(x + 6, y - 3, 6, 0, 2 * Math.PI);
+                ctx.fill();
 
-                // 绘制标签 - 截断过长的文本
+                // 绘制边框
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // 绘制标签
                 ctx.fillStyle = '#374151';
-                ctx.font = '10px Inter, sans-serif';
+                ctx.font = '11px Inter, sans-serif';
                 ctx.textAlign = 'left';
-                const maxLabelWidth = 100;
+
+                const maxLabelWidth = 110;
                 let displayLabel = label;
                 if (ctx.measureText(label).width > maxLabelWidth) {
-                    // 截断文本并添加省略号
                     while (ctx.measureText(displayLabel + '...').width > maxLabelWidth && displayLabel.length > 0) {
                         displayLabel = displayLabel.slice(0, -1);
                     }
@@ -884,8 +1183,202 @@ class SimpleVisualization {
         });
     }
 
+    // 添加饼图交互
+    addPieChartInteraction(canvas, slicePositions) {
+        const handleMouseMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
+            let found = false;
+            for (const slice of slicePositions) {
+                if (this.isPointInSlice(x, y, slice)) {
+                    canvas.style.cursor = 'pointer';
+                    this.showTooltip(e.clientX, e.clientY,
+                        `${slice.label}<br/>数量: ${slice.value}<br/>占比: ${slice.percentage}%`);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                canvas.style.cursor = 'default';
+                this.hideTooltip();
+            }
+        };
+
+        const handleMouseLeave = () => {
+            canvas.style.cursor = 'default';
+            this.hideTooltip();
+        };
+
+        // 移除旧的事件监听器
+        canvas.removeEventListener('mousemove', handleMouseMove);
+        canvas.removeEventListener('mouseleave', handleMouseLeave);
+
+        // 添加新的事件监听器
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    // 检查点是否在扇形内
+    isPointInSlice(x, y, slice) {
+        const dx = x - slice.centerX;
+        const dy = y - slice.centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > slice.radius) return false;
+
+        let angle = Math.atan2(dy, dx);
+        if (angle < 0) angle += 2 * Math.PI;
+
+        let startAngle = slice.startAngle;
+        let endAngle = slice.endAngle;
+
+        if (startAngle < 0) {
+            startAngle += 2 * Math.PI;
+            endAngle += 2 * Math.PI;
+        }
+
+        return angle >= startAngle && angle <= endAngle;
+    }
+
+    // 导出图表为图片
+    exportChart(canvasId, filename = 'chart') {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.warn('Canvas元素不存在:', canvasId);
+            return;
+        }
+
+        try {
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.download = `${filename}_${new Date().getTime()}.png`;
+            link.href = canvas.toDataURL('image/png');
+
+            // 触发下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            console.log('图表导出成功:', filename);
+        } catch (error) {
+            console.error('图表导出失败:', error);
+            alert('图表导出失败，请重试');
+        }
+    }
+
+    // 添加图表控制按钮
+    addChartControls(canvasId, chartTitle) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        const chartCard = canvas.closest('.chart-card');
+        if (!chartCard) return;
+
+        // 检查是否已经添加了控制按钮
+        if (chartCard.querySelector('.chart-controls')) return;
+
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'chart-controls';
+        controlsDiv.innerHTML = `
+            <button class="chart-control-btn" onclick="window.visualization.exportChart('${canvasId}', '${chartTitle}')">
+                <i class="fas fa-download"></i> 导出
+            </button>
+            <button class="chart-control-btn" onclick="window.visualization.refreshChart('${canvasId}')">
+                <i class="fas fa-refresh"></i> 刷新
+            </button>
+        `;
+
+        chartCard.appendChild(controlsDiv);
+    }
+
+    // 刷新图表
+    refreshChart(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        // 添加刷新动画
+        canvas.style.opacity = '0.5';
+        canvas.style.transform = 'scale(0.95)';
+
+        setTimeout(() => {
+            canvas.style.opacity = '1';
+            canvas.style.transform = 'scale(1)';
+        }, 300);
+    }
+
+    // 添加图表缩放功能
+    addZoomFeature(canvas) {
+        let scale = 1;
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+        let translateX = 0;
+        let translateY = 0;
+
+        const handleWheel = (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale *= delta;
+            scale = Math.max(0.5, Math.min(3, scale)); // 限制缩放范围
+
+            canvas.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+        };
+
+        const handleMouseDown = (e) => {
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            canvas.style.cursor = 'grabbing';
+        };
+
+        const handleMouseMove = (e) => {
+            if (!isDragging) return;
+
+            const deltaX = e.clientX - lastX;
+            const deltaY = e.clientY - lastY;
+
+            translateX += deltaX / scale;
+            translateY += deltaY / scale;
+
+            canvas.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+
+            lastX = e.clientX;
+            lastY = e.clientY;
+        };
+
+        const handleMouseUp = () => {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        };
+
+        // 添加事件监听器
+        canvas.addEventListener('wheel', handleWheel);
+        canvas.addEventListener('mousedown', handleMouseDown);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseup', handleMouseUp);
+        canvas.addEventListener('mouseleave', handleMouseUp);
+
+        // 设置初始光标
+        canvas.style.cursor = 'grab';
+    }
+
+    // 清理资源
+    cleanup() {
+        if (this.tooltip && this.tooltip.parentNode) {
+            this.tooltip.parentNode.removeChild(this.tooltip);
+        }
+
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+        }
+    }
 }
 
 // 导出供外部使用
 window.SimpleVisualization = SimpleVisualization;
+
+// 创建全局实例
+window.visualization = new SimpleVisualization();
