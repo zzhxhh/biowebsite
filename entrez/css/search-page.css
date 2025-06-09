@@ -133,12 +133,10 @@
     transform: rotate(-1deg);
 }
 
-.test-btn {
     background: #28a745;
     border-color: #1e7e34;
 }
 
-.test-btn:hover {
     background: #218838;
 }
 
@@ -404,15 +402,11 @@
     }
 }
 
-
-
 /* 深色模式适配 */
 [data-theme="dark"] .chart-card {
     background: var(--surface-color);
     border-color: var(--border-color);
 }
-
-
 
 /* 响应式设计 */
 @media (max-width: 768px) {
@@ -452,6 +446,4 @@
     .view-toggle-btn {
         justify-content: center;
     }
-
-
 }

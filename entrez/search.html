@@ -120,7 +120,6 @@
                             <button type="submit" class="search-btn" id="searchBtn">
                                 <i class="fas fa-search"></i> 搜索
                             </button>
-                            <button type="button" class="search-btn test-btn" onclick="window.bioinfoSearchInstance?.testVisualization()">
                                 <i class="fas fa-flask"></i> 测试可视化
                             </button>
                         </div>
@@ -417,7 +416,6 @@
             }
 
             // 测试功能
-            testVisualization() {
                 const mockData = {
                     success: true,
                     database: 'pubmed',
@@ -740,7 +738,6 @@
         }
 
         // 测试可视化功能
-        function testVisualization() {
             console.log('🧪 开始测试可视化功能');
 
             // 模拟搜索结果数据
@@ -774,15 +771,11 @@
         }
 
         // 添加测试按钮到页面
-        function addTestButton() {
             const searchButtons = document.querySelector('.search-buttons');
             if (searchButtons) {
-                const testBtn = document.createElement('button');
-                testBtn.type = 'button';
                 testBtn.className = 'search-btn';
                 testBtn.style.marginLeft = '10px';
                 testBtn.innerHTML = '<i class="fas fa-flask"></i> 测试可视化';
-                testBtn.onclick = testVisualization;
                 searchButtons.appendChild(testBtn);
             }
         }
@@ -812,7 +805,6 @@
         // 添加搜索页面专用的猫咪菜单功能
         document.addEventListener('DOMContentLoaded', () => {
             // 添加测试按钮
-            addTestButton();
 
             // 修复图表高度
             setTimeout(fixChartHeights, 1000);
