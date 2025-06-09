@@ -15,43 +15,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 try {
-    // 获取参数
-    $database = $_GET['db'] ?? 'pubmed';
-    $keyword = $_GET['term'] ?? '';
-    $retmax = min(50, max(1, intval($_GET['retmax'] ?? 20)));
-
-    // 验证参数
-    if (empty($keyword)) {
-        throw new Exception('搜索关键词不能为空');
-    }
-
-    $allowedDbs = ['pubmed', 'gene', 'protein', 'nucleotide'];
-    if (!in_array($database, $allowedDbs)) {
-        throw new Exception('不支持的数据库类型');
-    }
-
     // 包含搜索函数
     require_once 'search_functions.php';
 
+    // 验证参数
+    $params = validateSearchParams($_GET);
+
     // 执行搜索
-    $results = searchNCBI($database, $keyword, $retmax);
-    
-    // 返回结果，标记为GET方式
-    echo json_encode([
-        'success' => true,
-        'method' => 'GET',
-        'database' => $database,
-        'keyword' => $keyword,
-        'count' => $results['count'],
-        'details' => $results['details']
-    ], JSON_UNESCAPED_UNICODE);
+    $results = searchNCBI($params['database'], $params['keyword'], $params['retmax']);
+
+    // 返回结果
+    echo json_encode(formatSearchResponse('GET', $params['database'], $params['keyword'], $results), JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     http_response_code(400);
-    echo json_encode([
-        'success' => false,
-        'method' => 'GET',
-        'error' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    echo json_encode(formatErrorResponse('GET', $e->getMessage()), JSON_UNESCAPED_UNICODE);
 }
 ?>

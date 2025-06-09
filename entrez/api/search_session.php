@@ -41,62 +41,39 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    // 获取POST参数
-    $database = $_POST['db'] ?? 'pubmed';
-    $keyword = $_POST['term'] ?? '';
-    $retmax = min(50, max(1, intval($_POST['retmax'] ?? 20)));
-
-    // 验证参数
-    if (empty($keyword)) {
-        throw new Exception('搜索关键词不能为空');
-    }
-
-    $allowedDbs = ['pubmed', 'gene', 'protein', 'nucleotide'];
-    if (!in_array($database, $allowedDbs)) {
-        throw new Exception('不支持的数据库类型');
-    }
-
-    // 将搜索参数存储到SESSION中
-    $_SESSION['search_params'] = [
-        'database' => $database,
-        'keyword' => $keyword,
-        'retmax' => $retmax,
-        'timestamp' => time()
-    ];
-
     // 包含搜索函数
     require_once 'search_functions.php';
 
-    // 执行搜索并存储结果到SESSION
-    $results = searchNCBI($database, $keyword, $retmax);
+    // 验证参数
+    $params = validateSearchParams($_POST);
 
-    $_SESSION['search_results'] = [
-        'success' => true,
-        'method' => 'SESSION',
-        'database' => $database,
-        'keyword' => $keyword,
-        'count' => $results['count'],
-        'details' => $results['details'],
+    // 将搜索参数存储到SESSION中
+    $_SESSION['search_params'] = [
+        'database' => $params['database'],
+        'keyword' => $params['keyword'],
+        'retmax' => $params['retmax'],
         'timestamp' => time()
     ];
 
-    // 直接返回搜索结果（简化版SESSION）
-    echo json_encode($_SESSION['search_results'], JSON_UNESCAPED_UNICODE);
+    // 执行搜索并存储结果到SESSION
+    $results = searchNCBI($params['database'], $params['keyword'], $params['retmax']);
+
+    $response = formatSearchResponse('SESSION', $params['database'], $params['keyword'], $results);
+    $response['timestamp'] = time();
+
+    $_SESSION['search_results'] = $response;
+
+    // 直接返回搜索结果
+    echo json_encode($response, JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
+    $errorResponse = formatErrorResponse('SESSION', $e->getMessage());
+    $errorResponse['timestamp'] = time();
+
     // 存储错误到SESSION
-    $_SESSION['search_results'] = [
-        'success' => false,
-        'method' => 'SESSION',
-        'error' => $e->getMessage(),
-        'timestamp' => time()
-    ];
+    $_SESSION['search_results'] = $errorResponse;
 
     http_response_code(400);
-    echo json_encode([
-        'success' => false,
-        'method' => 'SESSION',
-        'error' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    echo json_encode($errorResponse, JSON_UNESCAPED_UNICODE);
 }
 ?>

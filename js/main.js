@@ -30,8 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         offset: 100
     });
 
-    // 加载主题
-    loadTheme();
+    // 主题由Utils自动加载
 
     // 加载用户收藏
     loadUserFavorites();
@@ -258,15 +257,7 @@ function showFilterResult(category) {
     // 移除自动消失功能，只保留手动关闭
 }
 
-// 主题切换 - 使用通用工具函数
-function toggleTheme() {
-    return Utils.toggleTheme();
-}
-
-// 加载主题 - 使用通用工具函数
-function loadTheme() {
-    return Utils.loadTheme();
-}
+// 主题切换由Utils自动处理，无需额外函数
 
 // 渲染工具
 function renderTools() {

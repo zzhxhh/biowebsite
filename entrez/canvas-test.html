@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas显示测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .chart-card {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .chart-card canvas {
+            width: 100% !important;
+            height: 300px !important;
+            border-radius: 10px;
+            display: block;
+            background: white;
+            border: 1px solid #e5e7eb;
+            transform: none !important;
+            position: static !important;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Canvas显示测试</h1>
+    
+    <div class="test-container">
+        <h2>📊 测试Canvas显示</h2>
+        <button onclick="testCanvas()">测试Canvas基础绘图</button>
+        <button onclick="testVisualization()">测试可视化组件</button>
+        <button onclick="checkCanvasSize()">检查Canvas尺寸</button>
+    </div>
+
+    <div class="chart-card">
+        <h3>📊 测试图表</h3>
+        <canvas id="testCanvas"></canvas>
+    </div>
+
+    <!-- 加载可视化组件 -->
+    <script src="js/simple-charts.js"></script>
+    
+    <script>
+        function testCanvas() {
+            console.log('🧪 测试Canvas基础绘图...');
+            
+            const canvas = document.getElementById('testCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置Canvas尺寸
+            canvas.width = canvas.offsetWidth || 400;
+            canvas.height = canvas.offsetHeight || 300;
+            
+            console.log(`Canvas尺寸: ${canvas.width}x${canvas.height}`);
+            console.log(`CSS尺寸: ${canvas.offsetWidth}x${canvas.offsetHeight}`);
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制背景
+            ctx.fillStyle = '#f0f8ff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制边框
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制测试图形
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillRect(50, 50, 100, 100);
+            
+            ctx.fillStyle = '#4ecdc4';
+            ctx.beginPath();
+            ctx.arc(250, 100, 50, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // 绘制文字
+            ctx.fillStyle = '#333';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Canvas测试成功', canvas.width / 2, canvas.height / 2);
+            
+            console.log('✅ Canvas基础绘图测试完成');
+        }
+        
+        function testVisualization() {
+            console.log('🧪 测试可视化组件...');
+            
+            if (typeof SimpleVisualization === 'undefined') {
+                console.error('❌ SimpleVisualization类未定义');
+                return;
+            }
+            
+            try {
+                const viz = new SimpleVisualization();
+                const canvas = document.getElementById('testCanvas');
+                
+                // 测试数据
+                const testData = {
+                    labels: ['A', 'B', 'C', 'D'],
+                    values: [10, 20, 15, 25]
+                };
+                
+                console.log('📊 开始绘制测试图表...');
+                viz.drawBarChartNative(canvas, testData, '测试柱状图');
+                console.log('✅ 可视化组件测试成功');
+                
+            } catch (error) {
+                console.error('❌ 可视化组件测试失败:', error);
+            }
+        }
+        
+        function checkCanvasSize() {
+            console.log('🔍 检查Canvas尺寸...');
+            
+            const canvas = document.getElementById('testCanvas');
+            console.log('Canvas元素:', canvas);
+            console.log('offsetWidth:', canvas.offsetWidth);
+            console.log('offsetHeight:', canvas.offsetHeight);
+            console.log('clientWidth:', canvas.clientWidth);
+            console.log('clientHeight:', canvas.clientHeight);
+            console.log('canvas.width:', canvas.width);
+            console.log('canvas.height:', canvas.height);
+            console.log('CSS width:', canvas.style.width);
+            console.log('CSS height:', canvas.style.height);
+            
+            const rect = canvas.getBoundingClientRect();
+            console.log('getBoundingClientRect:', rect);
+        }
+        
+        // 页面加载完成后自动测试
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 页面加载完成');
+            setTimeout(() => {
+                checkCanvasSize();
+                testCanvas();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

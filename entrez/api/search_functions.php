@@ -1,7 +1,57 @@
 <?php
 /**
- * 共享的搜索函数
+ * 共享的搜索函数和工具函数
  */
+
+/**
+ * 统一的参数验证函数
+ */
+function validateSearchParams($params) {
+    $database = $params['db'] ?? 'pubmed';
+    $keyword = $params['term'] ?? '';
+    $retmax = min(50, max(1, intval($params['retmax'] ?? 20)));
+
+    // 验证参数
+    if (empty($keyword)) {
+        throw new Exception('搜索关键词不能为空');
+    }
+
+    $allowedDbs = ['pubmed', 'gene', 'protein', 'nucleotide'];
+    if (!in_array($database, $allowedDbs)) {
+        throw new Exception('不支持的数据库类型');
+    }
+
+    return [
+        'database' => $database,
+        'keyword' => $keyword,
+        'retmax' => $retmax
+    ];
+}
+
+/**
+ * 统一的响应格式化函数
+ */
+function formatSearchResponse($method, $database, $keyword, $results) {
+    return [
+        'success' => true,
+        'method' => $method,
+        'database' => $database,
+        'keyword' => $keyword,
+        'count' => $results['count'],
+        'details' => $results['details']
+    ];
+}
+
+/**
+ * 统一的错误响应函数
+ */
+function formatErrorResponse($method, $error) {
+    return [
+        'success' => false,
+        'method' => $method,
+        'error' => $error
+    ];
+}
 
 /**
  * 搜索NCBI数据库

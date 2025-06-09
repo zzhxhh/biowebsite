@@ -5,24 +5,24 @@ const websitesDetail = [
         id: 24,
         name: "生物信息检索",
         category: "utility",
-        description: "🏆 自主开发的专业生物信息数据库搜索工具，基于NCBI Entrez，支持多种数据库检索。",
-        detailedDescription: "这是我们完全自主开发的专业生物信息检索工具，集成NCBI Entrez数据库，支持PubMed文献、Gene基因、Protein蛋白质等多个数据库的搜索。提供可视化图表展示搜索结果，支持交互式数据浏览。具有GET、POST、SESSION三种搜索方式，展示了完整的前后端开发技术。",
+        description: "基于NCBI Entrez API开发的简单生物信息数据库搜索工具，支持基础的数据库检索功能。",
+        detailedDescription: "这是一个基于NCBI Entrez API开发的学习项目，实现了对PubMed文献、Gene基因、Protein蛋白质等数据库的基础搜索功能。提供简单的可视化图表展示搜索结果，支持GET、POST、SESSION三种搜索方式，是一个用于学习生物信息学和Web开发技术的实践项目。",
         url: "entrez/search.html",
         icon: "fas fa-dna",
         pricing: "free",
         featured: true,
         selfDeveloped: true, // 标识为自主开发
         priority: 1, // 最高优先级
-        features: ["多数据库支持", "XML数据解析", "可视化图表", "交互式结果", "实时搜索", "数据导出", "三种搜索方式", "响应式设计"],
-        useCases: ["学术研究：文献检索、基因查找", "生物信息：蛋白质分析、序列搜索", "医学研究：疾病相关研究", "教学演示：生物信息学教学"],
-        pros: ["完全自主开发", "数据权威可靠", "搜索功能强大", "结果可视化", "操作简单直观", "技术实现完整"],
-        cons: ["需要网络连接", "英文数据库为主", "专业性较强"],
+        features: ["多数据库支持", "XML数据解析", "基础可视化", "简单交互", "实时搜索", "三种搜索方式", "响应式设计"],
+        useCases: ["学习研究：文献检索练习", "生物信息：基础数据查询", "教学演示：API调用示例", "技术学习：Web开发实践"],
+        pros: ["开源学习项目", "API调用实践", "基础功能完整", "代码结构清晰", "操作简单直观", "适合学习参考"],
+        cons: ["功能相对简单", "需要网络连接", "英文数据库为主", "仅供学习使用"],
         pricingDetails: {
-            free: { name: "完全免费", price: "免费", features: ["无限搜索", "所有数据库", "可视化图表", "数据导出", "源码开放"] }
+            free: { name: "完全免费", price: "免费", features: ["基础搜索", "多个数据库", "简单可视化", "源码开放", "学习使用"] }
         },
-        rating: 4.9,
-        reviews: 1250,
-        tags: ["自主开发", "生物信息", "数据库检索", "学术研究", "NCBI", "可视化"]
+        rating: 4.2,
+        reviews: 85,
+        tags: ["学习项目", "生物信息", "数据库检索", "API调用", "NCBI", "Web开发"]
     },
 
     // AI工具分类 (5个)

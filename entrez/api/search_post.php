@@ -25,43 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    // 获取POST参数
-    $database = $_POST['db'] ?? 'pubmed';
-    $keyword = $_POST['term'] ?? '';
-    $retmax = min(50, max(1, intval($_POST['retmax'] ?? 20)));
-
-    // 验证参数
-    if (empty($keyword)) {
-        throw new Exception('搜索关键词不能为空');
-    }
-
-    $allowedDbs = ['pubmed', 'gene', 'protein', 'nucleotide'];
-    if (!in_array($database, $allowedDbs)) {
-        throw new Exception('不支持的数据库类型');
-    }
-
     // 包含搜索函数
     require_once 'search_functions.php';
 
+    // 验证参数
+    $params = validateSearchParams($_POST);
+
     // 执行搜索
-    $results = searchNCBI($database, $keyword, $retmax);
-    
-    // 返回结果，标记为POST方式
-    echo json_encode([
-        'success' => true,
-        'method' => 'POST',
-        'database' => $database,
-        'keyword' => $keyword,
-        'count' => $results['count'],
-        'details' => $results['details']
-    ], JSON_UNESCAPED_UNICODE);
+    $results = searchNCBI($params['database'], $params['keyword'], $params['retmax']);
+
+    // 返回结果
+    echo json_encode(formatSearchResponse('POST', $params['database'], $params['keyword'], $results), JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     http_response_code(400);
-    echo json_encode([
-        'success' => false,
-        'method' => 'POST',
-        'error' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    echo json_encode(formatErrorResponse('POST', $e->getMessage()), JSON_UNESCAPED_UNICODE);
 }
 ?>
