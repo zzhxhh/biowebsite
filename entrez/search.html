@@ -120,9 +120,6 @@
                             <button type="submit" class="search-btn" id="searchBtn">
                                 <i class="fas fa-search"></i> 搜索
                             </button>
-                            <button type="button" class="search-btn test-btn" onclick="window.bioinfoSearchInstance?.testVisualization()">
-                                <i class="fas fa-flask"></i> 测试可视化
-                            </button>
                         </div>
                     </form>
 
@@ -174,10 +171,7 @@
                                     <div class="chart-loading" id="yearChartLoading" style="display: none;">
                                         正在加载图表...
                                     </div>
-                                    <div style="position: relative;">
-                                        <canvas id="yearChart"></canvas>
-                                        <div class="chart-zoom-hint">滚轮缩放 | 拖拽移动</div>
-                                    </div>
+                                    <canvas id="yearChart"></canvas>
                                 </div>
 
                                 <!-- 统计分布图 -->
@@ -186,15 +180,10 @@
                                     <div class="chart-loading" id="statsChartLoading" style="display: none;">
                                         正在加载图表...
                                     </div>
-                                    <div style="position: relative;">
-                                        <canvas id="statsChart"></canvas>
-                                        <div class="chart-zoom-hint">滚轮缩放 | 拖拽移动</div>
-                                    </div>
+                                    <canvas id="statsChart"></canvas>
                                 </div>
                             </div>
                         </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -254,15 +243,8 @@
     <script src="../js/utils.js"></script>
     <script src="../js/auth.js"></script>
     <script src="js/simple-charts.js"></script>
-
     <script>
         // 认证相关功能 - 保持原有逻辑
-
-
-
-
-
-
 
         // 极简搜索应用
         class SimpleSearchApp {
@@ -374,6 +356,8 @@
             }
 
             displayResults(data) {
+                console.log('📊 开始显示搜索结果...', data);
+
                 const resultCount = document.getElementById('resultCount');
                 const resultList = document.getElementById('resultList');
 
@@ -390,8 +374,20 @@
 
                 this.results.style.display = 'block';
 
-                // 生成简单图表
-                this.visualization.generateCharts(data.database, data.details);
+                // 检查可视化组件状态
+                console.log('🔍 检查可视化组件:', this.visualization);
+
+                if (this.visualization) {
+                    console.log('📈 开始生成图表...');
+                    try {
+                        this.visualization.generateCharts(data.database, data.details);
+                        console.log('✅ 图表生成调用成功');
+                    } catch (error) {
+                        console.error('❌ 图表生成失败:', error);
+                    }
+                } else {
+                    console.error('❌ 可视化组件未初始化');
+                }
             }
 
             createResultItem(item) {
@@ -434,26 +430,6 @@
 
                 this.form.appendChild(errorDiv);
                 setTimeout(() => errorDiv.remove(), 5000);
-            }
-
-            // 测试功能
-            testVisualization() {
-                const mockData = {
-                    success: true,
-                    database: 'pubmed',
-                    method: 'test',
-                    count: 20,
-                    details: Array.from({length: 20}, (_, i) => ({
-                        title: `Test Article ${i + 1}: Machine Learning in Bioinformatics`,
-                        year: 2018 + Math.floor(Math.random() * 6),
-                        authors: ['Smith J', 'Johnson A', 'Brown K'],
-                        journal: 'Nature Biotechnology',
-                        abstract: 'This is a sample abstract for testing visualization purposes...',
-                        pmid: `12345${i}`,
-                        url: '#'
-                    }))
-                };
-                this.displayResults(mockData);
             }
         }
 
@@ -759,83 +735,32 @@
             console.log('✅ 退出登录成功，停留在当前页面');
         }
 
-        // 测试可视化功能
-        function testVisualization() {
-            console.log('🧪 开始测试可视化功能');
+        // 修复图表显示的函数
+        function fixChartDisplay() {
+            console.log('🔧 修复图表显示...');
 
-            // 模拟搜索结果数据
-            const mockData = {
-                success: true,
-                database: 'pubmed',
-                method: 'test',
-                count: 20,
-                details: []
-            };
-
-            // 生成模拟数据
-            for (let i = 0; i < 20; i++) {
-                mockData.details.push({
-                    title: `Test Article ${i + 1}: Machine Learning in Bioinformatics`,
-                    year: 2018 + Math.floor(Math.random() * 6),
-                    authors: ['Smith J', 'Johnson A', 'Brown K'],
-                    journal: 'Nature Biotechnology',
-                    abstract: 'This is a sample abstract for testing visualization purposes...',
-                    pmid: `12345${i}`,
-                    url: '#'
-                });
-            }
-
-            // 获取全局搜索实例并显示结果
-            if (window.bioinfoSearchInstance) {
-                window.bioinfoSearchInstance.displayResults(mockData);
-            } else {
-                console.error('❌ 搜索实例未找到');
-            }
-        }
-
-        // 添加测试按钮到页面
-        function addTestButton() {
-            const searchButtons = document.querySelector('.search-buttons');
-            if (searchButtons) {
-                const testBtn = document.createElement('button');
-                testBtn.type = 'button';
-                testBtn.className = 'search-btn';
-                testBtn.style.marginLeft = '10px';
-                testBtn.innerHTML = '<i class="fas fa-flask"></i> 测试可视化';
-                testBtn.onclick = testVisualization;
-                searchButtons.appendChild(testBtn);
-            }
-        }
-
-        // 修复图表高度的函数
-        function fixChartHeights() {
-            console.log('🔧 修复图表高度...');
-
-            // 修复所有Canvas元素
-            document.querySelectorAll('.chart-canvas-wrapper canvas').forEach(canvas => {
-                canvas.style.height = '420px';
-                canvas.style.width = '100%';
-                if (canvas.parentElement) {
-                    canvas.parentElement.style.height = '420px';
+            // 确保Canvas元素正确显示
+            const canvases = ['yearChart', 'statsChart'];
+            canvases.forEach(id => {
+                const canvas = document.getElementById(id);
+                if (canvas) {
+                    // 重置任何可能的transform
+                    canvas.style.transform = 'none';
+                    canvas.style.position = 'static';
+                    canvas.style.left = 'auto';
+                    canvas.style.top = 'auto';
+                    console.log(`✅ 修复Canvas: ${id}`);
                 }
             });
 
-            // 修复D3和Plotly容器
-            document.querySelectorAll('.d3-container, .plotly-container').forEach(container => {
-                container.style.height = '420px';
-                container.style.width = '100%';
-            });
-
-            console.log('✅ 图表高度修复完成');
+            console.log('✅ 图表显示修复完成');
         }
 
         // 添加搜索页面专用的猫咪菜单功能
         document.addEventListener('DOMContentLoaded', () => {
-            // 添加测试按钮
-            addTestButton();
+            // 修复图表显示
+            setTimeout(fixChartDisplay, 1000);
 
-            // 修复图表高度
-            setTimeout(fixChartHeights, 1000);
             const pixelCatMenu = document.getElementById('pixel-cat-menu');
             if (pixelCatMenu) {
                 pixelCatMenu.addEventListener('click', (e) => {
