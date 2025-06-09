@@ -138,13 +138,11 @@
 
                     // 确定重定向URL
                     const redirectUrl = getRedirectUrl();
-                    console.log('🔗 登录成功，重定向到:', redirectUrl);
 
                     setTimeout(() => {
                         // 在重定向URL中添加标识参数
                         const separator = redirectUrl.includes('?') ? '&' : '?';
                         const finalUrl = `${redirectUrl}${separator}from_login=1`;
-                        console.log('🔗 最终重定向URL:', finalUrl);
                         window.location.href = finalUrl;
                     }, 1500);
                 } else {
@@ -162,46 +160,31 @@
 
         // 获取重定向URL
         function getRedirectUrl() {
-            console.log('🔍 开始获取重定向URL...');
-
             // 1. 检查URL参数中的redirect
             const urlParams = new URLSearchParams(window.location.search);
             const redirectParam = urlParams.get('redirect');
-            console.log('📋 URL参数redirect:', redirectParam);
             if (redirectParam) {
-                console.log('✅ 从URL参数获取重定向:', redirectParam);
                 return decodeURIComponent(redirectParam);
             }
 
             // 2. 检查localStorage中保存的重定向URL
             const savedRedirect = localStorage.getItem('loginRedirectUrl');
-            console.log('💾 localStorage中的重定向URL:', savedRedirect);
             if (savedRedirect) {
                 localStorage.removeItem('loginRedirectUrl'); // 使用后清除
-                console.log('✅ 从localStorage获取重定向:', savedRedirect);
                 return savedRedirect;
             }
 
             // 3. 检查referrer（来源页面）
             const referrer = document.referrer;
-            console.log('🔙 Referrer:', referrer);
             if (referrer && !referrer.includes('/auth/') && !referrer.includes('/login')) {
-                console.log('✅ 从referrer获取重定向:', referrer);
                 return referrer;
             }
 
             // 4. 默认返回首页
-            console.log('🏠 使用默认重定向: 首页');
             return '../index.html';
         }
 
-        // 页面加载时显示调试信息
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🔍 登录页面加载完成，检查重定向信息...');
-            console.log('📋 当前URL:', window.location.href);
-            console.log('💾 localStorage中的重定向URL:', localStorage.getItem('loginRedirectUrl'));
-            console.log('🔙 Referrer:', document.referrer);
-        });
+
 
         // 显示消息 - 使用通用工具函数
         function showMessage(message, type) {
