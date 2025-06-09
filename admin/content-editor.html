@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站内容管理 - 专业内容编辑工具</title>
+    <meta name="description" content="专业的网站内容管理工具，支持实时编辑、预览和发布网站内容，提供可视化编辑体验。">
+
+    <!-- 外部资源 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- 主网站样式 -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../pet/pixel-cat.css">
+
+    <!-- 管理页面专用样式 -->
+    <link rel="stylesheet" href="css/admin.css">
+
+    <!-- CKEditor 5 -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar" data-aos="fade-down">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-robot"></i>
+                <span>网站导航</span>
+            </div>
+
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    首页
+                </a>
+
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="搜索网站..." disabled>
+                </div>
+
+                <a href="../about.html" class="nav-link">
+                    <i class="fas fa-info-circle"></i>
+                    关于我们
+                </a>
+
+                <!-- 管理员入口按钮 - 激活状态 -->
+                <button class="nav-link admin-btn admin-active" id="adminBtn">
+                    <i class="fas fa-user-shield"></i>
+                    管理员
+                </button>
+
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 管理页面头部 -->
+        <section class="admin-hero" data-aos="fade-up">
+            <div class="container">
+                <h1><i class="fas fa-cog"></i> 网站内容管理</h1>
+                <p>🏆 专业的网站内容编辑工具，支持实时预览和发布</p>
+                <p>编辑网站标题、描述、统计数据等内容，让您的网站更加个性化</p>
+            </div>
+        </section>
+
+        <!-- 编辑功能区域 -->
+        <section class="admin-section" data-aos="fade-up" data-aos-delay="200">
+            <div class="container">
+                <div class="admin-card">
+                    <!-- 状态指示器和快捷操作 -->
+                    <div class="admin-status" id="adminStatus">
+                        <div class="status-item">
+                            <i class="fas fa-circle status-indicator" id="statusIndicator"></i>
+                            <span id="statusText">准备编辑</span>
+                        </div>
+                        <div class="status-actions">
+                            <button class="status-btn" id="saveAllBtn">
+                                <i class="fas fa-save"></i> 保存
+                            </button>
+                            <button class="status-btn" id="previewChangesBtn">
+                                <i class="fas fa-eye"></i> 预览
+                            </button>
+                            <button class="status-btn" id="publishChangesBtn">
+                                <i class="fas fa-upload"></i> 发布
+                            </button>
+                            <button class="status-btn" id="resetChangesBtn">
+                                <i class="fas fa-undo"></i> 重置
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 编辑区域 -->
+                    <div class="edit-sections">
+                        <!-- 网站标题和描述 -->
+                        <div class="edit-section">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="fas fa-heading"></i>
+                                    网站标题和描述
+                                </h3>
+                                <button class="toggle-section" data-target="site-info">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="section-content" id="site-info">
+                                <div class="form-group">
+                                    <label for="siteTitle">网站标题</label>
+                                    <input type="text" id="siteTitle" class="form-control" placeholder="网站主标题">
+                                </div>
+                                <div class="form-group">
+                                    <label for="siteSubtitle">网站副标题</label>
+                                    <input type="text" id="siteSubtitle" class="form-control" placeholder="网站副标题">
+                                </div>
+                                <div class="form-group">
+                                    <label for="siteDescription">网站描述</label>
+                                    <textarea id="siteDescription" class="form-control" rows="3" placeholder="网站描述"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 头部横幅内容 -->
+                        <div class="edit-section">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="fas fa-image"></i>
+                                    头部横幅内容
+                                </h3>
+                                <button class="toggle-section" data-target="hero-content">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="section-content" id="hero-content">
+                                <div class="form-group">
+                                    <label for="heroTitle">主标题</label>
+                                    <input type="text" id="heroTitle" class="form-control" placeholder="头部主标题">
+                                </div>
+                                <div class="form-group">
+                                    <label for="heroDescription">描述文字</label>
+                                    <textarea id="heroDescription" class="form-control" rows="3" placeholder="头部描述"></textarea>
+                                </div>
+                                <div class="stats-editor">
+                                    <label>统计数据</label>
+                                    <div class="stats-grid">
+                                        <div class="stat-item">
+                                            <input type="number" id="statWebsites" placeholder="网站数量">
+                                            <input type="text" id="statWebsitesLabel" placeholder="标签">
+                                        </div>
+                                        <div class="stat-item">
+                                            <input type="number" id="statCategories" placeholder="分类数量">
+                                            <input type="text" id="statCategoriesLabel" placeholder="标签">
+                                        </div>
+                                        <div class="stat-item">
+                                            <input type="text" id="statYear" placeholder="年份">
+                                            <input type="text" id="statYearLabel" placeholder="标签">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 页脚内容 -->
+                        <div class="edit-section">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="fas fa-info-circle"></i>
+                                    页脚内容
+                                </h3>
+                                <button class="toggle-section" data-target="footer-content">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="section-content" id="footer-content">
+                                <div class="form-group">
+                                    <label for="footerTitle">页脚标题</label>
+                                    <input type="text" id="footerTitle" class="form-control" placeholder="页脚主标题">
+                                </div>
+                                <div class="form-group">
+                                    <label for="footerDescription">页脚描述</label>
+                                    <textarea id="footerDescription" class="form-control" rows="3" placeholder="页脚描述"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="copyrightText">版权信息</label>
+                                    <input type="text" id="copyrightText" class="form-control" placeholder="版权信息">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 富文本内容编辑 -->
+                        <div class="edit-section">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="fas fa-align-left"></i>
+                                    自定义内容区域
+                                </h3>
+                                <button class="toggle-section" data-target="rich-content">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="section-content" id="rich-content">
+                                <div class="form-group">
+                                    <label for="customContent">自定义HTML内容</label>
+                                    <textarea id="customContent" name="customContent"></textarea>
+                                </div>
+                                <div class="content-actions">
+                                    <button id="insertCustomBtn" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> 插入到主页
+                                    </button>
+                                    <button id="previewCustomBtn" class="btn btn-info">
+                                        <i class="fas fa-eye"></i> 预览内容
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 预览模态框 -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> 预览效果</h3>
+                <button class="modal-close" id="closePreview">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="previewFrame" src="" style="width: 100%; height: 70vh; border: none; border-radius: 8px;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义内容预览模态框 -->
+    <div id="customPreviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-code"></i> 自定义内容预览</h3>
+                <button class="modal-close" id="closeCustomPreview">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="customPreviewContent" class="preview-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer" data-aos="fade-up">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🛠️ 网站内容管理</h3>
+                    <p>专业的网站内容编辑工具，支持实时编辑、预览和发布功能。</p>
+                </div>
+                <div class="footer-section">
+                    <h4>🎯 功能特色</h4>
+                    <ul>
+                        <li>📝 可视化编辑</li>
+                        <li>👁️ 实时预览</li>
+                        <li>🚀 一键发布</li>
+                        <li>🎨 响应式设计</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>📊 技术实现</h4>
+                    <div class="footer-stats">
+                        <p>🛠️ 自主开发</p>
+                        <p>📂 CKEditor 5</p>
+                        <p>🆕 实时内容管理</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 网站内容管理工具 - 张子豪的作品 (2330416015). 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 加载提示 -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>正在处理...</p>
+        </div>
+    </div>
+
+    <!-- 纯GIF桌宠 -->
+    <div id="pixel-cat-container">
+        <div id="pixel-cat-menu" class="pixel-cat-menu">
+            <div class="pixel-menu-item" data-action="home">🏠 回到首页</div>
+            <div class="pixel-menu-item" data-action="top">⬆️ 回到顶部</div>
+            <div class="pixel-menu-item" data-action="favorites">❤️ 我的收藏</div>
+            <div class="pixel-menu-item" data-action="theme">🎨 切换主题</div>
+            <div class="pixel-menu-item" data-action="singing">
+                <i class="fas fa-music"></i>
+                <span>让我唱歌</span>
+            </div>
+            <div class="pixel-menu-item" data-action="sleep">😴 休息</div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="js/content-editor.js"></script>
+    <script src="../pet/pixel-cat.js"></script>
+</body>
+</html>

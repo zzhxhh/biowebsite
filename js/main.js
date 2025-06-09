@@ -726,4 +726,142 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ESC键关闭详情页 - 已在Utils中统一处理
     // 详情页ESC关闭功能已在Utils.bindGlobalEvents()中实现
+
+    // 检查管理员权限
+    checkAdminAccess();
 });
+
+// 检查管理员权限
+function checkAdminAccess() {
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+    if (isAdmin) {
+        // 更新管理员按钮状态
+        updateAdminButtonState(true);
+
+        // 添加管理员快速编辑功能
+        setTimeout(() => {
+            if (window.contentManager) {
+                window.contentManager.addAdminEntry();
+            }
+        }, 1000);
+    }
+}
+
+// 显示管理员登录对话框
+function showAdminLogin() {
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+    if (isAdmin) {
+        // 已经是管理员，直接打开管理页面
+        window.open('admin/content-editor.html', '_blank');
+        return;
+    }
+
+    // 创建自定义登录对话框
+    const modal = document.createElement('div');
+    modal.className = 'admin-login-modal';
+    modal.innerHTML = `
+        <div class="admin-login-content">
+            <div class="admin-login-header">
+                <h3><i class="fas fa-user-shield"></i> 管理员登录</h3>
+                <button class="close-btn" onclick="this.closest('.admin-login-modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-login-body">
+                <p>请输入管理员密码：</p>
+                <div class="password-hint">
+                    <i class="fas fa-info-circle"></i>
+                    提示：密码是 <code>test</code>
+                </div>
+                <input type="password" id="adminPassword" placeholder="输入密码..." class="admin-password-input">
+                <div class="admin-login-actions">
+                    <button onclick="this.closest('.admin-login-modal').remove()" class="btn-cancel">取消</button>
+                    <button onclick="verifyAdminPassword()" class="btn-login">登录</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 聚焦到密码输入框
+    setTimeout(() => {
+        document.getElementById('adminPassword').focus();
+    }, 100);
+
+    // 支持回车键登录
+    document.getElementById('adminPassword').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            verifyAdminPassword();
+        }
+    });
+}
+
+// 验证管理员密码
+function verifyAdminPassword() {
+    const password = document.getElementById('adminPassword').value;
+    const modal = document.querySelector('.admin-login-modal');
+
+    if (password === 'test') {
+        localStorage.setItem('isAdmin', 'true');
+
+        // 显示成功消息
+        if (window.Utils && window.Utils.showMessage) {
+            window.Utils.showMessage('管理员登录成功！', 'success');
+        }
+
+        // 更新按钮状态
+        updateAdminButtonState(true);
+
+        // 关闭对话框
+        modal.remove();
+
+        // 启用管理员功能
+        setTimeout(() => {
+            if (window.contentManager) {
+                window.contentManager.addAdminEntry();
+            }
+        }, 500);
+
+        // 1秒后自动打开管理页面
+        setTimeout(() => {
+            window.open('admin/content-editor.html', '_blank');
+        }, 1000);
+
+    } else {
+        // 密码错误
+        const passwordInput = document.getElementById('adminPassword');
+        passwordInput.style.borderColor = '#ef4444';
+        passwordInput.style.animation = 'shake 0.5s ease-in-out';
+
+        if (window.Utils && window.Utils.showMessage) {
+            window.Utils.showMessage('密码错误！', 'error');
+        }
+
+        // 清空输入框并重新聚焦
+        setTimeout(() => {
+            passwordInput.value = '';
+            passwordInput.style.borderColor = '';
+            passwordInput.style.animation = '';
+            passwordInput.focus();
+        }, 500);
+    }
+}
+
+// 更新管理员按钮状态
+function updateAdminButtonState(isAdmin) {
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn) {
+        if (isAdmin) {
+            adminBtn.innerHTML = '<i class="fas fa-cog"></i> 管理';
+            adminBtn.title = '打开管理面板';
+            adminBtn.classList.add('admin-active');
+        } else {
+            adminBtn.innerHTML = '<i class="fas fa-user-shield"></i> 管理员';
+            adminBtn.title = '管理员登录';
+            adminBtn.classList.remove('admin-active');
+        }
+    }
+}

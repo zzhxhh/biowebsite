@@ -435,6 +435,27 @@
 
         // 初始化搜索功能
         document.addEventListener('DOMContentLoaded', () => {
+            // 确保loading状态初始为隐藏
+            const loadingElement = document.getElementById('loading');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+                console.log('✅ Loading状态已隐藏');
+            }
+
+            // 确保结果区域初始为隐藏
+            const resultsElement = document.getElementById('results');
+            if (resultsElement) {
+                resultsElement.style.display = 'none';
+                console.log('✅ 结果区域已隐藏');
+            }
+
+            // 确保进度条初始为隐藏
+            const progressElement = document.getElementById('progress');
+            if (progressElement) {
+                progressElement.style.display = 'none';
+                console.log('✅ 进度条已隐藏');
+            }
+
             window.bioinfoSearchInstance = new SimpleSearchApp();
 
             // 初始化AOS动画

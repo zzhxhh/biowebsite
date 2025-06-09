@@ -110,14 +110,219 @@ body {
     background: rgba(45, 55, 72, 0.95);
 }
 
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+/* 管理员按钮样式 - 完全统一 */
+.admin-btn {
+    /* 移除所有特殊样式，让它继承 .nav-link 的样式 */
+    background: none !important;
+    border: none !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    padding: inherit !important;
+    border-radius: inherit !important;
+    transform: inherit !important;
+    transition: inherit !important;
+}
+
+.admin-btn:hover {
+    /* 继承 .nav-link:hover 的样式 */
+    background: inherit !important;
+    color: inherit !important;
+    transform: inherit !important;
+}
+
+/* 管理员登录成功后的微妙提示 */
+.admin-btn.admin-active {
+    color: var(--primary-color) !important;
+}
+
+.admin-btn.admin-active:hover {
+    color: var(--primary-color) !important;
+    background: rgba(123, 159, 152, 0.1) !important;
+}
+
+/* 管理员登录对话框样式 */
+.admin-login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.admin-login-content {
+    background: var(--surface-color);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    max-width: 90vw;
+    animation: slideUp 0.3s ease;
+}
+
+.admin-login-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.admin-login-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.admin-login-body {
+    padding: 25px;
+}
+
+.admin-login-body p {
+    margin: 0 0 15px 0;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.password-hint {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%);
+    border: 1px solid #81d4fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #0277bd;
+}
+
+[data-theme="dark"] .password-hint {
+    background: linear-gradient(135deg, #1e3a8a 0%, #581c87 100%);
+    border-color: #3b82f6;
+    color: #93c5fd;
+}
+
+.password-hint code {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #1565c0;
+}
+
+[data-theme="dark"] .password-hint code {
+    background: rgba(0, 0, 0, 0.3);
+    color: #60a5fa;
+}
+
+.admin-password-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--background-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.admin-password-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.admin-login-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.btn-cancel, .btn-login {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel {
+    background: var(--text-secondary);
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #6b7280;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-login:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-1px);
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
     height: 80px;
+    gap: 20px;
 }
 
 .nav-logo {
@@ -156,13 +361,16 @@ body {
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 20px;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: nowrap;
 }
 
 .search-container {
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .search-container i {
@@ -214,6 +422,7 @@ body {
     transform: rotate(5deg);
     box-shadow: var(--shadow-light);
     position: relative;
+    justify-self: end;
 }
 
 .theme-toggle:hover {
@@ -2523,15 +2732,17 @@ body {
 .nav-link {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 15px;
+    gap: 5px;
+    padding: 8px 12px;
     text-decoration: none;
     color: var(--text-secondary);
     font-family: 'Kalam', cursive;
     font-weight: 500;
-    border-radius: 15px;
+    font-size: 0.9rem;
+    border-radius: 12px;
     transition: all 0.3s ease;
     transform: rotate(0.5deg);
+    white-space: nowrap;
 }
 
 .nav-link:hover,
@@ -4316,5 +4527,86 @@ body {
 
     .stat-number {
         font-size: 2rem;
+    }
+}
+
+/* 导航栏响应式优化 - 网格布局 */
+@media (max-width: 1200px) {
+    .nav-container {
+        max-width: 100%;
+        padding: 0 15px;
+        gap: 15px;
+        grid-template-columns: 1fr 1.5fr 1fr;
+    }
+
+    .nav-menu {
+        gap: 8px;
+    }
+
+    .nav-link {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        gap: 4px;
+    }
+
+    .nav-link i {
+        font-size: 0.9rem;
+    }
+
+    #searchInput {
+        width: 280px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .nav-container {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+    }
+
+    .nav-link {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .nav-menu {
+        gap: 6px;
+    }
+
+    #searchInput {
+        width: 250px;
+    }
+}
+
+@media (max-width: 900px) {
+    .nav-container {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .nav-logo {
+        order: 1;
+        justify-content: center;
+    }
+
+    .search-container {
+        order: 2;
+        justify-content: center;
+    }
+
+    .nav-menu {
+        order: 3;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .theme-toggle {
+        order: 4;
+        align-self: center;
+        justify-self: center;
     }
 }
